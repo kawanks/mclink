@@ -1,0 +1,4 @@
+library(Rcpp)
+
+matrix <- matrix(c(0, 1, 2, 0, 0, 3, 1, 2, 0), ncol=3, nrow=3)
+relative_diff(matrix)
