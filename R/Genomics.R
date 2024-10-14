@@ -1,4 +1,9 @@
 library(Rcpp)
 
-matrix <- matrix(c(0, 1, 2, 0, 0, 3, 1, 2, 0), ncol=3, nrow=3)
+sourceCpp('../src/relative_diff.cpp')
+
+dados <- read.csv('../data/dados.csv', header=F)
+matrix <- as.matrix(dados)
+matrix
+
 relative_diff(matrix)
