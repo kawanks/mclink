@@ -1,0 +1,15 @@
+.Rproj.user
+.Rhistory
+.RData
+.httr-oauth
+.DS_Store
+.quarto
+
+## Compiled
+src/*.o
+src/*.so
+src/*.dll
+src/symbols.rds
+
+## VSCode
+.vscode/
