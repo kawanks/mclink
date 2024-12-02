@@ -1,17 +1,40 @@
-#include <Rcpp.h>
+// [[Rcpp::depends(RcppArmadillo)]]
+#include <RcppArmadillo.h>
 
 // [[Rcpp::export]]
-Rcpp::NumericMatrix relative_diff(Rcpp::NumericMatrix& M)
+arma::sp_mat relative_diff(arma::sp_mat &M_transpose)
 {
-  int rows = M.rows();
-  Rcpp::NumericMatrix relative_diff_matrix(rows, rows);
+  // Transpose the genomic matrix for operating in rows
+  arma::sp_mat M = M_transpose.t();
   
-  for (int i = 0; i < rows; ++i) {
-    for (int j = i+1; j < rows; ++j) {
+  size_t rows = M.n_rows;
+  size_t cols = M.n_cols;
+  arma::sp_mat relative_diff_matrix(rows, rows);
+  
+  for(arma::sp_mat::const_iterator it = M.begin(); it != M.end(); ++it)
+  {
+    size_t row = it.row();
+    size_t col = it.col();
+    
+    size_t cont = 0;
+    
+    for(size_t k = col + 1; k < cols; ++k)
+    {
+      if (M(col + 1) <= 0) {
+        cont += 1;
+      }
+    }
+    
+    
+  }
+  
+  /*
+  for (size_t i = 0; i < rows; ++i) {
+    for (size_t j = i+1; j < rows; ++j) {
       double count = 0.0;
       double denom = 0.0;
       
-      for (size_t k = 0; k < M.row(i).size(); ++k) {
+      for (size_t k = 0; k < cols; ++k) {
         if ((M(i, k) == 0 && M(j, k) == 0) || (M(i, k) > 0 && M(j, k) > 0)) {
           count += 1;
         }
@@ -24,7 +47,7 @@ Rcpp::NumericMatrix relative_diff(Rcpp::NumericMatrix& M)
         relative_diff_matrix(i, j) = relative_diff_matrix(j, i) = 1.0 - (count / denom); // Tells how divergent they are
       }
     }
-  }
+  }*/
   
   return relative_diff_matrix;
 }

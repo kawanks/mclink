@@ -11,12 +11,12 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // relative_diff
-Rcpp::NumericMatrix relative_diff(Rcpp::NumericMatrix& M);
+Rcpp::NumericMatrix relative_diff(RcppArmadillo::SpMat<int>& M);
 RcppExport SEXP _mclink_relative_diff(SEXP MSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix& >::type M(MSEXP);
+    Rcpp::traits::input_parameter< RcppArmadillo::SpMat<int>& >::type M(MSEXP);
     rcpp_result_gen = Rcpp::wrap(relative_diff(M));
     return rcpp_result_gen;
 END_RCPP
