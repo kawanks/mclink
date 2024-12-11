@@ -1,11 +1,13 @@
 Package: mclink
 Type: Package
-Title: What the Package Does in One 'Title Case' Line
+Title: Concise Summary of What the Package Does
 Version: 1.0
-Date: 2024-10-14
-Author: Your Name
-Maintainer: Your Name <your@email.com>
-Description: One paragraph description of what the package does as one or more full sentences.
+Date: 2024-11-11
+Authors@R: person("Kawan", "Santana", role = c("aut", "cre"), email = "kawansantana18@gmail.com")
+Description: More about what it does (maybe more than one line).
 License: GPL (>= 2)
+Suggests: tinytest
+Encoding: UTF-8
+RoxygenNote: 7.3.2
 Imports: Rcpp (>= 1.0.13)
-LinkingTo: Rcpp
+LinkingTo: Rcpp, RcppArmadillo, RcppProgress

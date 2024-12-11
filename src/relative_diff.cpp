@@ -1,53 +1,56 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
 
+// [[Rcpp::depends(RcppProgress)]]
+#include <progress.hpp>
+#include <progress_bar.hpp>
+
 // [[Rcpp::export]]
-arma::sp_mat relative_diff(arma::sp_mat &M_transpose)
+arma::sp_mat relative_diff(arma::sp_mat &M)
 {
-  // Transpose the genomic matrix for operating in rows
-  arma::sp_mat M = M_transpose.t();
-  
+  // Get the dimensions of the matrix
   size_t rows = M.n_rows;
   size_t cols = M.n_cols;
-  arma::sp_mat relative_diff_matrix(rows, rows);
-  
-  for(arma::sp_mat::const_iterator it = M.begin(); it != M.end(); ++it)
-  {
-    size_t row = it.row();
-    size_t col = it.col();
-    
-    size_t cont = 0;
-    
-    for(size_t k = col + 1; k < cols; ++k)
-    {
-      if (M(col + 1) <= 0) {
-        cont += 1;
-      }
-    }
-    
-    
-  }
   
   /*
-  for (size_t i = 0; i < rows; ++i) {
-    for (size_t j = i+1; j < rows; ++j) {
-      double count = 0.0;
-      double denom = 0.0;
+   * The matrix of relative differences is defined as sparse matrix just because
+   * the operations between a sparse matrix type and a dense matrix type cost 
+   * more, in terms of complexity, than the operations between two matrices of
+   * sparse type, even that one of them is a dense matrix.
+   */
+  arma::sp_mat relative_diff_matrix(rows, rows);
+  
+  Progress p(rows, true);
+  for(size_t i = 0; i < rows - 1; i++)
+  {
+    if (Progress::check_abort() )
+      return NULL;
+    
+    for(size_t k = i + 1; k < rows; k++)
+    {
+      size_t diff = 0;
       
-      for (size_t k = 0; k < cols; ++k) {
-        if ((M(i, k) == 0 && M(j, k) == 0) || (M(i, k) > 0 && M(j, k) > 0)) {
-          count += 1;
-        }
-        if (M(i, k) >= 0 && M(j, k) >= 0) {
-          denom += 1;
-        }
+      for(arma::sp_mat::const_row_iterator it = M.begin_row(i); it != M.end_row(i); ++it)
+      {
+        size_t col = it.col();
+        
+        if(M(k, col) <= 0) diff++;
       }
       
-      if (denom > 0) {
-        relative_diff_matrix(i, j) = relative_diff_matrix(j, i) = 1.0 - (count / denom); // Tells how divergent they are
+      for(arma::sp_mat::const_row_iterator it = M.begin_row(k); it != M.end_row(k); ++it)
+      {
+        size_t col = it.col();
+        
+        if(M(i, col) <= 0) diff++;
       }
+      
+      relative_diff_matrix(i, k) = relative_diff_matrix(k, i) = (double)diff/cols;
     }
-  }*/
+    
+    p.increment();
+    
+    Rprintf("Linha %zu\n", i);
+  }
   
   return relative_diff_matrix;
 }
