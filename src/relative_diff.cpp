@@ -5,8 +5,7 @@
 arma::sp_mat relative_diff(arma::sp_mat &M)
 {
   // Get the dimensions of the matrix
-  size_t cols = M.n_cols;
-  size_t rows = M.n_rows;
+  size_t cols = M.n_cols, diff, rows;
   
   /*
    * The matrix of relative differences is defined as sparse matrix just because
@@ -20,7 +19,8 @@ arma::sp_mat relative_diff(arma::sp_mat &M)
   {
     for(size_t k = i + 1; k < cols; k++)
     {
-      size_t diff = 0;
+      diff = 0;
+      rows = M.n_rows;
       
       for(arma::sp_mat::const_col_iterator it = M.begin_col(i); it != M.end_col(i); ++it)
       {
@@ -35,8 +35,8 @@ arma::sp_mat relative_diff(arma::sp_mat &M)
       {
         size_t row = it.row();
         
-        if(M(row, k) == 0) diff++;
-        else if(M(row, k) < 0) rows--;
+        if(M(row, i) == 0) diff++;
+        else if(M(row, i) < 0) rows--;
       }
       
       relative_diff_matrix(i, k) = (double) diff/rows;
@@ -46,3 +46,15 @@ arma::sp_mat relative_diff(arma::sp_mat &M)
   
   return relative_diff_matrix;
 }
+
+
+// [[Rcpp::export]]
+arma::sp_mat shuffle_relative_diff(arma::sp_mat &M)
+{
+  arma::mat shuffled = arma::shuffle(M.as_dense(), 1);
+  arma::sp_mat sp_shuffled = arma::sp_mat(shuffled);
+  
+  return relative_diff(sp_shuffled);
+}
+
+

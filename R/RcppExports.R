@@ -5,3 +5,15 @@ relative_diff <- function(M) {
     .Call(`_mclink_relative_diff`, M)
 }
 
+shuffle_relative_diff <- function(M) {
+    .Call(`_mclink_shuffle_relative_diff`, M)
+}
+
+cal_var <- function(M) {
+    .Call(`_mclink_cal_var`, M)
+}
+
+nonzero <- function(M) {
+    .Call(`_mclink_nonzero`, M)
+}
+
