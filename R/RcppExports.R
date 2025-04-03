@@ -9,11 +9,7 @@ shuffle_relative_diff <- function(M) {
     .Call(`_mclink_shuffle_relative_diff`, M)
 }
 
-cal_var <- function(M) {
-    .Call(`_mclink_cal_var`, M)
-}
-
-nonzero <- function(M) {
-    .Call(`_mclink_nonzero`, M)
+simulate_panmixia <- function(dados, iterations) {
+    .Call(`_mclink_simulate_panmixia`, dados, iterations)
 }
 

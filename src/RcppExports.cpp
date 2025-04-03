@@ -33,25 +33,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// cal_var
-double cal_var(arma::sp_mat& M);
-RcppExport SEXP _mclink_cal_var(SEXP MSEXP) {
+// simulate_panmixia
+arma::vec simulate_panmixia(arma::sp_mat& dados, size_t iterations);
+RcppExport SEXP _mclink_simulate_panmixia(SEXP dadosSEXP, SEXP iterationsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::sp_mat& >::type M(MSEXP);
-    rcpp_result_gen = Rcpp::wrap(cal_var(M));
-    return rcpp_result_gen;
-END_RCPP
-}
-// nonzero
-arma::vec nonzero(arma::sp_mat& M);
-RcppExport SEXP _mclink_nonzero(SEXP MSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::sp_mat& >::type M(MSEXP);
-    rcpp_result_gen = Rcpp::wrap(nonzero(M));
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type dados(dadosSEXP);
+    Rcpp::traits::input_parameter< size_t >::type iterations(iterationsSEXP);
+    rcpp_result_gen = Rcpp::wrap(simulate_panmixia(dados, iterations));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -59,8 +49,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_mclink_relative_diff", (DL_FUNC) &_mclink_relative_diff, 1},
     {"_mclink_shuffle_relative_diff", (DL_FUNC) &_mclink_shuffle_relative_diff, 1},
-    {"_mclink_cal_var", (DL_FUNC) &_mclink_cal_var, 1},
-    {"_mclink_nonzero", (DL_FUNC) &_mclink_nonzero, 1},
+    {"_mclink_simulate_panmixia", (DL_FUNC) &_mclink_simulate_panmixia, 2},
     {NULL, NULL, 0}
 };
 

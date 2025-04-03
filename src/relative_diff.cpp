@@ -58,3 +58,27 @@ arma::sp_mat shuffle_relative_diff(arma::sp_mat &M)
 }
 
 
+//[[Rcpp:export]]
+double cal_var(arma::sp_mat &M)
+{
+  return arma::var(arma::nonzeros(M));
+}
+
+
+// [[Rcpp::export]]
+arma::vec simulate_panmixia(arma::sp_mat &dados, size_t iterations)
+{
+  arma::sp_mat e_i;
+  
+  for(size_t i = 0 ; i < iterations; ++i){
+    e_i = shuffle_relative_diff(dados);
+  }
+  
+  return arma::nonzeros(e_i);
+}
+
+
+
+
+
+
