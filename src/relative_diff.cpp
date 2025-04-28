@@ -26,17 +26,16 @@ arma::sp_mat relative_diff(arma::sp_mat &M)
       {
         size_t row = it.row();
         
-        if(M(row, k) == 0) diff++;
-        else if(M(row, k) < 0) rows--;
-        
+        if(M(row, i) < 0 || M(row, k) < 0) rows--;
+        else if(M(row, k) == 0) diff++;
       }
       
       for(arma::sp_mat::const_col_iterator it = M.begin_col(k); it != M.end_col(k); ++it)
       {
         size_t row = it.row();
         
-        if(M(row, i) == 0) diff++;
-        else if(M(row, i) < 0) rows--;
+        if(M(row, i) == 0 && M(row, k) < 0) rows--;
+        else if(M(row, i) == 0 && M(row, k) > 0) diff++;
       }
       
       relative_diff_matrix(i, k) = (double) diff/rows;
