@@ -11,18 +11,58 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// hello
-void hello();
-RcppExport SEXP _mclink_hello() {
+// relative_diff
+arma::sp_mat relative_diff(arma::sp_mat& M);
+RcppExport SEXP _mclink_relative_diff(SEXP MSEXP) {
 BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    hello();
-    return R_NilValue;
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type M(MSEXP);
+    rcpp_result_gen = Rcpp::wrap(relative_diff(M));
+    return rcpp_result_gen;
+END_RCPP
+}
+// shuffle_relative_diff
+arma::sp_mat shuffle_relative_diff(arma::sp_mat M);
+RcppExport SEXP _mclink_shuffle_relative_diff(SEXP MSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::sp_mat >::type M(MSEXP);
+    rcpp_result_gen = Rcpp::wrap(shuffle_relative_diff(M));
+    return rcpp_result_gen;
+END_RCPP
+}
+// simulate_panmixia
+arma::vec simulate_panmixia(arma::sp_mat& dados, size_t iterations);
+RcppExport SEXP _mclink_simulate_panmixia(SEXP dadosSEXP, SEXP iterationsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type dados(dadosSEXP);
+    Rcpp::traits::input_parameter< size_t >::type iterations(iterationsSEXP);
+    rcpp_result_gen = Rcpp::wrap(simulate_panmixia(dados, iterations));
+    return rcpp_result_gen;
+END_RCPP
+}
+// simulate_panmixia_vec
+arma::mat simulate_panmixia_vec(arma::sp_mat& dados, size_t iterations);
+RcppExport SEXP _mclink_simulate_panmixia_vec(SEXP dadosSEXP, SEXP iterationsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::sp_mat& >::type dados(dadosSEXP);
+    Rcpp::traits::input_parameter< size_t >::type iterations(iterationsSEXP);
+    rcpp_result_gen = Rcpp::wrap(simulate_panmixia_vec(dados, iterations));
+    return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_mclink_hello", (DL_FUNC) &_mclink_hello, 0},
+    {"_mclink_relative_diff", (DL_FUNC) &_mclink_relative_diff, 1},
+    {"_mclink_shuffle_relative_diff", (DL_FUNC) &_mclink_shuffle_relative_diff, 1},
+    {"_mclink_simulate_panmixia", (DL_FUNC) &_mclink_simulate_panmixia, 2},
+    {"_mclink_simulate_panmixia_vec", (DL_FUNC) &_mclink_simulate_panmixia_vec, 2},
     {NULL, NULL, 0}
 };
 
