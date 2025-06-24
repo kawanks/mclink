@@ -5,15 +5,3 @@ relative_diff <- function(M) {
     .Call(`_mclink_relative_diff`, M)
 }
 
-shuffle_relative_diff <- function(M) {
-    .Call(`_mclink_shuffle_relative_diff`, M)
-}
-
-simulate_panmixia <- function(dados, iterations) {
-    .Call(`_mclink_simulate_panmixia`, dados, iterations)
-}
-
-simulate_panmixia_vec <- function(dados, iterations) {
-    .Call(`_mclink_simulate_panmixia_vec`, dados, iterations)
-}
-
