@@ -22,9 +22,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// mc_sample_matrix
+std::vector<int> mc_sample_matrix(const arma::sp_mat& M, const size_t sample_size, const int min_distance);
+RcppExport SEXP _mclink_mc_sample_matrix(SEXP MSEXP, SEXP sample_sizeSEXP, SEXP min_distanceSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::sp_mat& >::type M(MSEXP);
+    Rcpp::traits::input_parameter< const size_t >::type sample_size(sample_sizeSEXP);
+    Rcpp::traits::input_parameter< const int >::type min_distance(min_distanceSEXP);
+    rcpp_result_gen = Rcpp::wrap(mc_sample_matrix(M, sample_size, min_distance));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_mclink_relative_diff", (DL_FUNC) &_mclink_relative_diff, 1},
+    {"_mclink_mc_sample_matrix", (DL_FUNC) &_mclink_mc_sample_matrix, 3},
     {NULL, NULL, 0}
 };
 

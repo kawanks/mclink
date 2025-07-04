@@ -5,3 +5,7 @@ relative_diff <- function(M) {
     .Call(`_mclink_relative_diff`, M)
 }
 
+mc_sample_matrix <- function(M, sample_size = 1000L, min_distance = 1000L) {
+    .Call(`_mclink_mc_sample_matrix`, M, sample_size, min_distance)
+}
+

@@ -1,5 +1,8 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
+#include <random>
+#include <vector>
+#include <algorithm> // To use std::min and std::max
 
 // Convert sparse column in a dense vector with: -1, 0 and 1
 arma::Col<int> convert_sign_vector(const arma::sp_vec &v, arma::uword n_rows) {
@@ -14,6 +17,7 @@ arma::Col<int> convert_sign_vector(const arma::sp_vec &v, arma::uword n_rows) {
   return result;
 }
 
+
 // Compare two vectors and calculate the proportion of equalities ignoring -1
 double hamming_proportion(const arma::Col<int> &a, const arma::Col<int> &b) {
   arma::uword n = a.n_elem;
@@ -27,6 +31,7 @@ double hamming_proportion(const arma::Col<int> &a, const arma::Col<int> &b) {
   
   return (valid > 0) ? static_cast<double>(matches) / valid : -1.0;
 }
+
 
 // [[Rcpp::export]]
 arma::mat relative_diff(const arma::sp_mat &M) {
@@ -51,3 +56,42 @@ arma::mat relative_diff(const arma::sp_mat &M) {
   return result;
 }
 
+
+// [[Rcpp::export]]
+std::vector<int> mc_sample_matrix(const arma::sp_mat &M, const size_t sample_size = 1000, const int min_distance = 1000){
+  int end = M.n_rows;
+  std::vector<int> rows(end);
+  std::iota(rows.begin(), rows.end(), 0); // Fill with the elements {0,1,...,M.nrows}
+  std::vector<int> sample;
+  std::vector<bool> avaiable(end, true); 
+  
+  sample.reserve(sample_size); // Reserve memory to at least sample_size elements
+  
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  
+  while(sample.size() < sample_size && end > 0){
+    std::uniform_int_distribution<int> unif(0, end - 1);
+    
+    int rpos = unif(gen);
+    int row_sampled = rows[rpos];
+    
+    if(!avaiable[row_sampled]){
+      std::swap(rows[rpos], rows[end-1]);
+      --end;
+      continue;
+    }
+    
+    sample.push_back(row_sampled);
+    
+    for(int i = std::max(0, row_sampled - min_distance); i <= std::min(static_cast<int>(avaiable.size()), row_sampled + min_distance); ++i){
+      avaiable[i] = false;
+    }
+    
+    std::swap(rows[rpos], rows[end-1]);
+    --end;
+  }
+  
+  std::sort(sample.begin(), sample.end());
+  return sample;
+}
