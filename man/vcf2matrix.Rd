@@ -4,13 +4,13 @@
 \alias{vcf2matrix}
 \title{Read a vcf file e returns a sparse matrix equivalent of the file}
 \usage{
-vcf2matrix(path)
+vcf2matrix(path, chrom = 0)
 }
 \arguments{
 \item{path}{path to vcf file}
 }
 \value{
-sparse matrix with the genotipypes
+sparse matrix with the genotypes
 }
 \description{
 Read a vcf file e returns a sparse matrix equivalent of the file
