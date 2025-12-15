@@ -3,5 +3,6 @@
 export(vcf2matrix)
 importFrom(Rcpp,evalCpp)
 importFrom(vcfR,extract.gt)
+importFrom(vcfR,getCHROM)
 importFrom(vcfR,read.vcfR)
 useDynLib(mclink, .registration = TRUE)

@@ -2,16 +2,18 @@
 % Please edit documentation in R/vcf2matrix.R
 \name{vcf2matrix}
 \alias{vcf2matrix}
-\title{Read a vcf file e returns a sparse matrix equivalent of the file}
+\title{Read a vcf file and returns a sparse matrix with the genotypes}
 \usage{
-vcf2matrix(path)
+vcf2matrix(path, chromNumber = 0)
 }
 \arguments{
 \item{path}{path to vcf file}
+
+\item{chromNumber}{number of the chromosome of interest}
 }
 \value{
-sparse matrix with the genotipypes
+sparse matrix with the genotypes of the vcf file
 }
 \description{
-Read a vcf file e returns a sparse matrix equivalent of the file
+Read a vcf file and returns a sparse matrix with the genotypes
 }

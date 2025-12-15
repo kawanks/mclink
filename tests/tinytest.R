@@ -1,4 +1,3 @@
-
-if ( requireNamespace("tinytest") ){
+if (requireNamespace("tinytest")) {
   tinytest::test_package("mclink")
 }
