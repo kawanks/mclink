@@ -2,7 +2,7 @@
 % Please edit documentation in R/vcf2matrix.R
 \name{get_chromosome}
 \alias{get_chromosome}
-\title{Get the chromosome of interest. 
+\title{Get the chromosome of interest.
 Assume that the vcf file is sorted by chromosome.}
 \usage{
 get_chromosome(vcf, chromNumber)
@@ -16,6 +16,6 @@ get_chromosome(vcf, chromNumber)
 vcf object with just the chromosome chosen
 }
 \description{
-Get the chromosome of interest. 
+Get the chromosome of interest.
 Assume that the vcf file is sorted by chromosome.
 }

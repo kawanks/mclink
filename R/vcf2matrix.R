@@ -4,6 +4,7 @@
 #' @param chromNumber number of the chromosome of interest
 #' @return sparse matrix with the genotypes of the vcf file
 #' @importFrom vcfR read.vcfR
+#' @importFrom Matrix Matrix
 #' @export
 vcf2matrix <- function(path, chromNumber = 0) {
   vcf <- read.vcfR(path)
