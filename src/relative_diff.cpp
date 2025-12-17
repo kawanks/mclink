@@ -63,44 +63,43 @@ arma::vec relative_diff(const arma::sp_mat &M) {
 }
 
 
-std::vector<int> mc_sample_rows(const int nrows, const size_t sample_size = 1000, const int min_distance = 1000){
-  int end = nrows;
-  std::vector<int> rows(end);
-  std::iota(rows.begin(), rows.end(), 0); // Fill with the elements {0,1,...,M.nrows}
-  std::vector<int> sample;
-  std::vector<bool> avaiable(end, true); 
+std::vector<int> mc_sample_rows(const std::vector<int>& pos, const size_t sample_size = 1000, const int min_distance = 1000){
+  int size = pos.size();
+  std::vector<int> rows(size);
+  std::iota(rows.begin(), rows.end(), 0);
   
-  sample.reserve(sample_size); // Reserve memory to at least sample_size elements
+  std::vector<int> sample;
+  sample.reserve(sample_size);
   
   std::random_device rd;
   std::mt19937 gen(rd());
   
-  while(sample.size() < sample_size && end > 0){
-    std::uniform_int_distribution<int> unif(0, end - 1);
-    
+  while(!rows.empty() && sample.size() < sample_size){
+    std::uniform_int_distribution<int> unif(0, rows.size() - 1);
     int rpos = unif(gen);
-    int row_sampled = rows[rpos];
+    int sampled_row = rows[rpos];
     
-    if(!avaiable[row_sampled]){
-      std::swap(rows[rpos], rows[end-1]);
-      --end;
-      continue;
-    }
+    sample.push_back(sampled_row);
     
-    sample.push_back(row_sampled);
+    int center = pos[sampled_row];
     
-    for(int i = std::max(0, row_sampled - min_distance); i <= std::min(static_cast<int>(avaiable.size()), row_sampled + min_distance); ++i){
-      avaiable[i] = false;
-    }
+    auto lower = std::lower_bound(rows.begin(), rows.end(), center - min_distance, 
+                                  [&](int row, int value){
+                                    return pos[row] < value;
+                                  });
     
-    std::swap(rows[rpos], rows[end-1]);
-    --end;
+    auto upper = std::upper_bound(rows.begin(), rows.end(), center + min_distance,
+                                  [&](int value, int row){
+                                    return pos[row] > value;
+                                  });
+    
+    rows.erase(lower, upper);
   }
   
   return sample;
 }
 
-
+/*
 // [[Rcpp::export]]
 arma::sp_mat mc_sample_matrix(const arma::sp_mat &M, const size_t sample_size, const int min_distance) {
   std::vector<int> rows = mc_sample_rows(M.n_rows, sample_size, min_distance);
@@ -198,7 +197,7 @@ arma::sp_mat mc_shuffle_matrix(const arma::sp_mat &M) {
  *  Esta função retorna uma matriz com duas colunas, a primeira coluna são
  *  as distâncias relativas observadas e a segunda coluna são as distâncias
  *  relativas de uma população panmítica.
-*/
+*//*
 // [[Rcpp::export]]
 arma::mat simulate_panmixia(const arma::sp_mat &M, const int iterations = 1000, const size_t sample_size = 1000, const int min_distance = 1000){
   std::vector<double> original_all;
@@ -226,4 +225,4 @@ arma::mat simulate_panmixia(const arma::sp_mat &M, const int iterations = 1000, 
   result.col(1) = arma::vec(shuffled_all);
  
   return result;
-}
+}*/
