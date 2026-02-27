@@ -1,11 +1,7 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::depends(RcppProgress)]]
 #include <RcppArmadillo.h>
-#include <random>
 #include <vector>
-#include <algorithm>
-#include <progress.hpp>
-#include <progress_bar.hpp>
 
 
 // Convert sparse column in a dense vector with: -1, 0 and 1

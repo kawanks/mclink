@@ -3,6 +3,9 @@
 #include <random>
 #include <string>
 #include <algorithm>
+#include <progress.hpp>
+#include <progress_bar.hpp>
+#include "relative_diff.h"
 
 
 // [[Rcpp::export(name = ".mc_sample_rows")]]
@@ -56,10 +59,12 @@ std::vector<int> mc_sample_rows(const std::vector<int>& chr,
   return sample;
 }
 
-/*
-// [[Rcpp::export]]
-arma::sp_mat mc_sample_matrix(const arma::sp_mat &M, const size_t sample_size, const int min_distance) {
-  std::vector<int> rows = mc_sample_rows(M.n_rows, sample_size, min_distance);
+arma::sp_mat mc_sample_matrix(const Rcpp::List data, const size_t sample_size, const int min_distance) {
+  arma::sp_mat M = Rcpp::as<arma::sp_mat>(data[0]);
+  std::vector<int> chrs = data[1];
+  std::vector<int> pos = data[2];
+
+  std::vector<int> rows = mc_sample_rows(chrs, pos, sample_size, min_distance);
   arma::uword n_sample = rows.size();
   arma::uword n_cols = M.n_cols;
   
@@ -98,7 +103,6 @@ arma::sp_mat mc_sample_matrix(const arma::sp_mat &M, const size_t sample_size, c
 }
 
 
-// [[Rcpp::export]]
 arma::sp_mat mc_shuffle_matrix(const arma::sp_mat &M) {
   const arma::uword n_rows = M.n_rows;
   const arma::uword n_cols = M.n_cols;
@@ -154,19 +158,22 @@ arma::sp_mat mc_shuffle_matrix(const arma::sp_mat &M) {
  *  Esta função retorna uma matriz com duas colunas, a primeira coluna são
  *  as distâncias relativas observadas e a segunda coluna são as distâncias
  *  relativas de uma população panmítica.
-*//*
+*/
 // [[Rcpp::export]]
-arma::mat simulate_panmixia(const arma::sp_mat &M, const int iterations = 1000, const size_t sample_size = 1000, const int min_distance = 1000){
+arma::mat simulate_panmixia(Rcpp::List data, const int iterations = 1000, const size_t sample_size = 1000, const int min_distance = 1000){
+  Rcpp::S4 geno = data[0];
+  int n_cols = Rcpp::IntegerVector(geno.slot("Dim"))[1];
+
   std::vector<double> original_all;
   std::vector<double> shuffled_all;
   Progress p(iterations, TRUE);
   
-  original_all.reserve(iterations * M.n_cols);
-  shuffled_all.reserve(iterations * M.n_cols);
+  original_all.reserve(iterations * n_cols);
+  shuffled_all.reserve(iterations * n_cols);
   
   for (int i = 0; i < iterations; ++i) {
     p.increment();
-    arma::sp_mat sample_matrix = mc_sample_matrix(M, sample_size, min_distance);
+    arma::sp_mat sample_matrix = mc_sample_matrix(data, sample_size, min_distance);
     arma::sp_mat shuffled_matrix = mc_shuffle_matrix(sample_matrix);
     
     arma::vec original = relative_diff(sample_matrix);
@@ -182,4 +189,4 @@ arma::mat simulate_panmixia(const arma::sp_mat &M, const int iterations = 1000, 
   result.col(1) = arma::vec(shuffled_all);
  
   return result;
-}*/
+}

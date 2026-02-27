@@ -25,6 +25,20 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// simulate_panmixia
+arma::mat simulate_panmixia(Rcpp::List data, const int iterations, const size_t sample_size, const int min_distance);
+RcppExport SEXP _mclink_simulate_panmixia(SEXP dataSEXP, SEXP iterationsSEXP, SEXP sample_sizeSEXP, SEXP min_distanceSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< const int >::type iterations(iterationsSEXP);
+    Rcpp::traits::input_parameter< const size_t >::type sample_size(sample_sizeSEXP);
+    Rcpp::traits::input_parameter< const int >::type min_distance(min_distanceSEXP);
+    rcpp_result_gen = Rcpp::wrap(simulate_panmixia(data, iterations, sample_size, min_distance));
+    return rcpp_result_gen;
+END_RCPP
+}
 // relative_diff
 arma::vec relative_diff(const arma::sp_mat& M);
 RcppExport SEXP _mclink_relative_diff(SEXP MSEXP) {
@@ -39,6 +53,7 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_mclink_mc_sample_rows", (DL_FUNC) &_mclink_mc_sample_rows, 4},
+    {"_mclink_simulate_panmixia", (DL_FUNC) &_mclink_simulate_panmixia, 4},
     {"_mclink_relative_diff", (DL_FUNC) &_mclink_relative_diff, 1},
     {NULL, NULL, 0}
 };
