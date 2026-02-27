@@ -1,9 +1,9 @@
-#' Read a vcf file and returns a sparse matrix with the genotypes
+#' Read a vcf file and returns a list with the chromossomes, the positions and the genotypes
 #'
 #' @param path path to vcf file
-#' @param chromNumber number of the chromosome of interest
-#' @return sparse matrix with the genotypes of the vcf file
-#' @importFrom vcfR read.vcfR
+#' @param chromNumber number of the chromosome of interest (optional)
+#' @return list with the chromossomes, the positions of the SNPs and a sparse matrix with the genotypes of the vcf file
+#' @importFrom vcfR read.vcfR getCHROM getPOS
 #' @importFrom Matrix Matrix
 #' @export
 vcf2matrix <- function(path, chromNumber = 0) {
@@ -11,11 +11,16 @@ vcf2matrix <- function(path, chromNumber = 0) {
 
   if (chromNumber != 0) vcf <- get_chromosome(vcf, chromNumber)
 
+
+  chrs <- getCHROM(vcf) |> factor() |> as.integer()
+  pos <- getPOS(vcf)
+
   geno <- extract.gt(vcf, element = "GT", as.numeric = TRUE)
   geno[is.na(geno)] <- -1
   dimension <- dim(geno)
   geno <- Matrix(data = geno, sparse = TRUE)
-  geno
+
+  list(geno, chrs, pos)
 }
 
 
