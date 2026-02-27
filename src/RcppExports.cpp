@@ -11,6 +11,20 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// mc_sample_rows
+std::vector<int> mc_sample_rows(const std::vector<int>& chr, const std::vector<int>& pos, const size_t sample_size, const int min_distance);
+RcppExport SEXP _mclink_mc_sample_rows(SEXP chrSEXP, SEXP posSEXP, SEXP sample_sizeSEXP, SEXP min_distanceSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<int>& >::type chr(chrSEXP);
+    Rcpp::traits::input_parameter< const std::vector<int>& >::type pos(posSEXP);
+    Rcpp::traits::input_parameter< const size_t >::type sample_size(sample_sizeSEXP);
+    Rcpp::traits::input_parameter< const int >::type min_distance(min_distanceSEXP);
+    rcpp_result_gen = Rcpp::wrap(mc_sample_rows(chr, pos, sample_size, min_distance));
+    return rcpp_result_gen;
+END_RCPP
+}
 // relative_diff
 arma::vec relative_diff(const arma::sp_mat& M);
 RcppExport SEXP _mclink_relative_diff(SEXP MSEXP) {
@@ -24,6 +38,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_mclink_mc_sample_rows", (DL_FUNC) &_mclink_mc_sample_rows, 4},
     {"_mclink_relative_diff", (DL_FUNC) &_mclink_relative_diff, 1},
     {NULL, NULL, 0}
 };
