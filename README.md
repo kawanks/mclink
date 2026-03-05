@@ -31,6 +31,7 @@ make all functions available again.
 ## Functions avaiable for now
 
 - `vcf2matrix`: reads a vcf file and returns a list with the chromossomes, the positions and the genotypes.
-- `simulate_panmixia`: receives a list returned by the vcf2matrix function and returns an $n\times 2$ matrix, with the first column containing the observed distribution
-obtained after all simulations and the second containing the simulated panmictic distribution simulated with the permutation of rows in the matrix.
+- `simulate_panmixia`: receives a list, returned by the vcf2matrix function, and returns a list with the first item containing the observed distribution
+obtained after all simulations, the second one containing the simulated panmictic distribution obtained through the permutation of rows in the matrix and the third one
+containing the variances of each simulation respectively.
 - `relative_diff`: receives a sparse matrix and returns a vector with the relative genetic distances of the genetic information that the matrix represents.
