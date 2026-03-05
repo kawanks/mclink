@@ -26,7 +26,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // simulate_panmixia
-arma::mat simulate_panmixia(Rcpp::List data, const int iterations, const size_t sample_size, const int min_distance);
+Rcpp::List simulate_panmixia(Rcpp::List data, const int iterations, const size_t sample_size, const int min_distance);
 RcppExport SEXP _mclink_simulate_panmixia(SEXP dataSEXP, SEXP iterationsSEXP, SEXP sample_sizeSEXP, SEXP min_distanceSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;

@@ -160,12 +160,13 @@ arma::sp_mat mc_shuffle_matrix(const arma::sp_mat &M) {
  *  relativas de uma população panmítica.
 */
 // [[Rcpp::export]]
-arma::mat simulate_panmixia(Rcpp::List data, const int iterations = 1000, const size_t sample_size = 1000, const int min_distance = 1000){
+Rcpp::List simulate_panmixia(Rcpp::List data, const int iterations = 1000, const size_t sample_size = 1000, const int min_distance = 1000){
   Rcpp::S4 geno = data[0];
   int n_cols = Rcpp::IntegerVector(geno.slot("Dim"))[1];
 
   std::vector<double> original_all;
   std::vector<double> shuffled_all;
+  std::vector<double> variances(iterations);
   Progress p(iterations, TRUE);
   
   original_all.reserve(iterations * n_cols);
@@ -178,15 +179,13 @@ arma::mat simulate_panmixia(Rcpp::List data, const int iterations = 1000, const 
     
     arma::vec original = relative_diff(sample_matrix);
     arma::vec shuffled = relative_diff(shuffled_matrix);
+    variances[i] = arma::var(original) / arma::var(shuffled);
     
     original_all.insert(original_all.end(), original.begin(), original.end());
     shuffled_all.insert(shuffled_all.end(), shuffled.begin(), shuffled.end());
   }
  
-  // Converter para arma::mat
-  arma::mat result(original_all.size(), 2);
-  result.col(0) = arma::vec(original_all);
-  result.col(1) = arma::vec(shuffled_all);
- 
+  Rcpp::List result = Rcpp::List::create(original_all, shuffled_all, variances);
+  
   return result;
 }
