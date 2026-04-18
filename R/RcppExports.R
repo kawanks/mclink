@@ -13,3 +13,7 @@ relative_diff <- function(M) {
     .Call(`_mclink_relative_diff`, M)
 }
 
+ld_decay <- function(data, maf = 0.05, bin_size = 1000L, max_dist = 100000L) {
+    .Call(`_mclink_ld_decay`, data, maf, bin_size, max_dist)
+}
+
