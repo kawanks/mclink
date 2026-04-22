@@ -50,9 +50,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// ld_decay
-Rcpp::List ld_decay(Rcpp::List data, double maf, int bin_size, int max_dist);
-RcppExport SEXP _mclink_ld_decay(SEXP dataSEXP, SEXP mafSEXP, SEXP bin_sizeSEXP, SEXP max_distSEXP) {
+// ld_decay_chr
+Rcpp::List ld_decay_chr(Rcpp::List data, double maf, int bin_size, int max_dist);
+RcppExport SEXP _mclink_ld_decay_chr(SEXP dataSEXP, SEXP mafSEXP, SEXP bin_sizeSEXP, SEXP max_distSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -60,7 +60,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type maf(mafSEXP);
     Rcpp::traits::input_parameter< int >::type bin_size(bin_sizeSEXP);
     Rcpp::traits::input_parameter< int >::type max_dist(max_distSEXP);
-    rcpp_result_gen = Rcpp::wrap(ld_decay(data, maf, bin_size, max_dist));
+    rcpp_result_gen = Rcpp::wrap(ld_decay_chr(data, maf, bin_size, max_dist));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -69,7 +69,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_mclink_mc_sample_rows", (DL_FUNC) &_mclink_mc_sample_rows, 4},
     {"_mclink_simulate_panmixia", (DL_FUNC) &_mclink_simulate_panmixia, 4},
     {"_mclink_relative_diff", (DL_FUNC) &_mclink_relative_diff, 1},
-    {"_mclink_ld_decay", (DL_FUNC) &_mclink_ld_decay, 4},
+    {"_mclink_ld_decay_chr", (DL_FUNC) &_mclink_ld_decay_chr, 4},
     {NULL, NULL, 0}
 };
 

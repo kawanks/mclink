@@ -141,13 +141,13 @@ Rcpp::List spmat2bitset(const arma::sp_mat &M){
 }
 
 // [[Rcpp::export]]
-Rcpp::List ld_decay(Rcpp::List data, 
+Rcpp::List ld_decay_chr(Rcpp::List data, 
                     double maf = 0.05,
                     int bin_size = 1000,
                     int max_dist = 100000){
   
   arma::sp_mat M = Rcpp::as<arma::sp_mat>(data[0]); 
-  std::vector<int> pos = Rcpp::as<std::vector<int>>(data[2]);
+  std::vector<int> pos = Rcpp::as<std::vector<int>>(data[1]);
   
   Rcpp::List Bitset = spmat2bitset(M);
   std::vector<uint64_t> G = Rcpp::as<std::vector<uint64_t>>(Bitset[0]);
