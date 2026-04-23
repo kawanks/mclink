@@ -51,16 +51,29 @@ BEGIN_RCPP
 END_RCPP
 }
 // ld_decay_chr
-Rcpp::List ld_decay_chr(Rcpp::List data, double maf, int bin_size, int max_dist);
-RcppExport SEXP _mclink_ld_decay_chr(SEXP dataSEXP, SEXP mafSEXP, SEXP bin_sizeSEXP, SEXP max_distSEXP) {
+Rcpp::List ld_decay_chr(Rcpp::List data, double maf, int max_dist, int bin_size);
+RcppExport SEXP _mclink_ld_decay_chr(SEXP dataSEXP, SEXP mafSEXP, SEXP max_distSEXP, SEXP bin_sizeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::List >::type data(dataSEXP);
     Rcpp::traits::input_parameter< double >::type maf(mafSEXP);
-    Rcpp::traits::input_parameter< int >::type bin_size(bin_sizeSEXP);
     Rcpp::traits::input_parameter< int >::type max_dist(max_distSEXP);
-    rcpp_result_gen = Rcpp::wrap(ld_decay_chr(data, maf, bin_size, max_dist));
+    Rcpp::traits::input_parameter< int >::type bin_size(bin_sizeSEXP);
+    rcpp_result_gen = Rcpp::wrap(ld_decay_chr(data, maf, max_dist, bin_size));
+    return rcpp_result_gen;
+END_RCPP
+}
+// interchr_ld_mean
+double interchr_ld_mean(Rcpp::List data, int n_pairs, double maf);
+RcppExport SEXP _mclink_interchr_ld_mean(SEXP dataSEXP, SEXP n_pairsSEXP, SEXP mafSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< int >::type n_pairs(n_pairsSEXP);
+    Rcpp::traits::input_parameter< double >::type maf(mafSEXP);
+    rcpp_result_gen = Rcpp::wrap(interchr_ld_mean(data, n_pairs, maf));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -70,6 +83,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_mclink_simulate_panmixia", (DL_FUNC) &_mclink_simulate_panmixia, 4},
     {"_mclink_relative_diff", (DL_FUNC) &_mclink_relative_diff, 1},
     {"_mclink_ld_decay_chr", (DL_FUNC) &_mclink_ld_decay_chr, 4},
+    {"_mclink_interchr_ld_mean", (DL_FUNC) &_mclink_interchr_ld_mean, 3},
     {NULL, NULL, 0}
 };
 

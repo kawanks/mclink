@@ -7,7 +7,7 @@ aggregate_ld_decay <- function(results) {
   
   for(res in results){
     
-    sum_r2 <- res$mean_r2 * res$count
+    sum_r2 <- res$mean * res$count
     
     sum_r2[is.na(sum_r2)] <- 0
     
@@ -15,21 +15,21 @@ aggregate_ld_decay <- function(results) {
     total_count <- total_count + res$count
   }
   
-  mean_r2 <- rep(NA, n_bins)
+  mean <- rep(NA, n_bins)
   
   idx <- total_count > 0
-  mean_r2[idx] <- total_sum[idx] / total_count[idx]
+  mean[idx] <- total_sum[idx] / total_count[idx]
   
   list(
     distance = results[[1]]$distance,
-    mean_r2  = mean_r2,
+    mean  = mean,
     count    = total_count
   )
 }
 
 
 #' @export
-ld_decay <- function(vcf, maf = 0.05){
+ld_decay <- function(vcf, maf = 0.05, max_dist = 100000){
   
   gt <- vcf[[1]]
   chrs_pos <- vcf[[2]]
@@ -44,7 +44,7 @@ ld_decay <- function(vcf, maf = 0.05){
     gt_chr  <- gt[idx, ]
     pos_chr <- pos[idx]
     
-    ld_decay_chr(list(gt_chr, pos_chr), maf)
+    ld_decay_chr(list(gt_chr, pos_chr, max_dist), maf)
   })
   
   aggregate_ld_decay(results)

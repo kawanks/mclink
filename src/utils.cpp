@@ -140,11 +140,12 @@ Rcpp::List spmat2bitset(const arma::sp_mat &M){
    );
 }
 
+
 // [[Rcpp::export]]
 Rcpp::List ld_decay_chr(Rcpp::List data, 
                     double maf = 0.05,
-                    int bin_size = 1000,
-                    int max_dist = 100000){
+                    int max_dist = 100000,
+                    int bin_size = 1000){
   
   arma::sp_mat M = Rcpp::as<arma::sp_mat>(data[0]); 
   std::vector<int> pos = Rcpp::as<std::vector<int>>(data[1]);
@@ -233,79 +234,77 @@ Rcpp::List ld_decay_chr(Rcpp::List data,
   );
 }
 
-/*
-std::vector<double> ld_r2(Rcpp::List data, double maf = 0.05){
-  arma::sp_mat M = Rcpp::as<arma::sp_mat>(data[0]); 
-  std::vector<int> pos = data[2];
+
+// [[Rcpp::export]]
+double interchr_ld_mean(Rcpp::List data,
+                        int n_pairs = 100000,
+                        double maf = 0.05) {
   
+  arma::sp_mat M = Rcpp::as<arma::sp_mat>(data[0]);
+  std::vector<int> chr = data[1];
+
   Rcpp::List Bitset = spmat2bitset(M);
-  std::vector<uint64_t> G = Bitset[0];
-  std::vector<uint64_t> Mk = Bitset[1];
-  
-  int snps = Rcpp::as<int>(Bitset[2]);
-  int parts = Rcpp::as<int>(Bitset[3]);
-  
+
+  auto G  = Rcpp::as<std::vector<uint64_t>>(Bitset["G"]);
+  auto Mk = Rcpp::as<std::vector<uint64_t>>(Bitset["M"]);
+
+  int snps  = Rcpp::as<int>(Bitset["snps"]);
+  int parts = Rcpp::as<int>(Bitset["parts"]);
+
+  double sum_r2 = 0.0;
   int count = 0;
+
+  for(int t = 0; t < n_pairs; t++){
   
-  for(int i = 0; i < snps; i++){
-    for(int j = 0; j < parts; j++){
-      uint64_t valid = G[i*snps + j] & Mk[i*snps + j];
-      count += __builtin_popcountll(valid);
-    }
-  }
+    int i = rand() % snps;
+    int j = rand() % snps;
   
-  arma::vec k = M * arma::ones<arma::vec>(M.n_cols);
-  arma::uword rows = M.n_rows;
-  arma::uword cols = M.n_cols;
+    if(chr[i] == chr[j]) continue;
   
-  std::vector<double> r2_values;
-  std::vector<double> k_ij(2);
+    int kij = 0, ki = 0, kj = 0, nij = 0;
   
-  for(size_t i = 0; i < rows; ++i){
-    double pi = k[i] / cols;
-    if(pi < maf || (1 - pi) < maf) continue;
+    for(int w = 0; w < parts; w++){
     
-    for(size_t j = i + 1; j < rows; ++j){
-      double pj = k[j] / cols;
-      if(pj < maf || (1 - pj) < maf) continue;
-      
-      k_ij = sparse_dot_product(M.begin_row(i), M.end_row(i), M.begin_row(j), M.end_row(j));
-      double pij = k_ij[0] / (cols - k_ij[1]);
-      
-      double den = (pi*(1-pi)*pj*(1-pj));
-      if(den <= 0) continue;
-      
-      double r2 = ((pij - pi*pj)*(pij - pi*pj)) / den;
-      
-      r2_values.push_back(r2);
+      uint64_t gi = G[i*parts + w];
+      uint64_t gj = G[j*parts + w];
+    
+      uint64_t mi = Mk[i*parts + w];
+      uint64_t mj = Mk[j*parts + w];
+    
+      uint64_t valid = mi & mj;
+      if(valid == 0) continue;
+    
+      nij += __builtin_popcountll(valid);
+    
+      kij += __builtin_popcountll(gi & gj & valid);
+      ki  += __builtin_popcountll(gi & valid);
+      kj  += __builtin_popcountll(gj & valid);
     }
+  
+    if(nij < 10) continue;
+  
+    double pi = (double) ki / nij;
+    double pj = (double) kj / nij;
+  
+    if(pi <= maf || pi >= (1.0 - maf)) continue;
+    if(pj <= maf || pj >= (1.0 - maf)) continue;
+  
+    double pij = (double) kij / nij;
+  
+    double D = pij - pi * pj;
+    double den = pi * (1.0 - pi) * pj * (1.0 - pj);
+  
+    if(den <= 0) continue;
+  
+    double r2 = (D * D) / den;
+  
+    if(std::isnan(r2) || std::isinf(r2)) continue;
+  
+    sum_r2 += r2;
+    count++;
   }
-  std::vector<double> r2_values;
-  return r2_values;
+  
+  if(count == 0) return NA_REAL;
+  
+  return sum_r2 / count;
 }
- */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
