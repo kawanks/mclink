@@ -7,3 +7,5 @@ src/*.o
 src/*.so
 src/*.dll
 .vscode/
+.DS_Store
+R/.DS_Store
