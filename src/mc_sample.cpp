@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <progress.hpp>
 #include <progress_bar.hpp>
-#include "relative_diff.h"
+#include "utils.h"
 
 
 // [[Rcpp::export(name = ".mc_sample_rows")]]
