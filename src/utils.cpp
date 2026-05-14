@@ -145,7 +145,7 @@ Rcpp::List spmat2bitset(const arma::sp_mat &M){
 Rcpp::List ld_decay_chr(Rcpp::List data, 
                     double maf = 0.05,
                     int max_dist = 100000,
-                    int bin_size = 1000){
+                    int bin_size = 500){
   
   arma::sp_mat M = Rcpp::as<arma::sp_mat>(data[0]); 
   std::vector<int> pos = Rcpp::as<std::vector<int>>(data[1]);
