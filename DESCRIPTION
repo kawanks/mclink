@@ -8,11 +8,14 @@ Description: More about what it does (maybe more than one line).
 License: GPL (>= 2)
 Suggests: tinytest
 Encoding: UTF-8
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Imports: 
+    ggplot2,
     Matrix,
+    patchwork,
     Rcpp (>= 1.0.13),
-    RcppProgress
+    RcppProgress,
+    vcfR
 LinkingTo: 
     Rcpp,
     RcppArmadillo,

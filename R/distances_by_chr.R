@@ -18,7 +18,8 @@
 distances_by_chr <- function(data, 
                              iterations = 1000,
                              sample_size = 1000,
-                             min_distance = 1000) {
+                             min_distance = 1000, 
+                             genome = TRUE) {
   
   geno <- data[[1]]
   chr  <- data[[2]]
@@ -42,9 +43,16 @@ distances_by_chr <- function(data,
                                          sample_size = sample_size,
                                          min_distance = min_distance)
   }
-  result_genome <- simulate_panmixia(data,
-                                     iterations = iterations,
-                                     sample_size = sample_size,
-                                     min_distance = min_distance)
-  list(genome = result_genome, chromosomes = result_chr)
+  if (genome) {
+    result_genome <- simulate_panmixia(data,
+                                       iterations   = iterations,
+                                       sample_size  = sample_size,
+                                       min_distance = min_distance)
+  } else {
+    result_genome <- NULL
+  }
+  
+  list(genome      = result_genome,
+       chromosomes = result_chr,
+       sample_size = sample_size) 
 }
