@@ -11,8 +11,36 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// mc_sample_rows
+std::vector<int> mc_sample_rows(const std::vector<int>& chr, const std::vector<int>& pos, const size_t sample_size, const int min_distance);
+RcppExport SEXP _mclink_mc_sample_rows(SEXP chrSEXP, SEXP posSEXP, SEXP sample_sizeSEXP, SEXP min_distanceSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const std::vector<int>& >::type chr(chrSEXP);
+    Rcpp::traits::input_parameter< const std::vector<int>& >::type pos(posSEXP);
+    Rcpp::traits::input_parameter< const size_t >::type sample_size(sample_sizeSEXP);
+    Rcpp::traits::input_parameter< const int >::type min_distance(min_distanceSEXP);
+    rcpp_result_gen = Rcpp::wrap(mc_sample_rows(chr, pos, sample_size, min_distance));
+    return rcpp_result_gen;
+END_RCPP
+}
+// simulate_panmixia
+Rcpp::List simulate_panmixia(Rcpp::List data, const int iterations, const size_t sample_size, const int min_distance);
+RcppExport SEXP _mclink_simulate_panmixia(SEXP dataSEXP, SEXP iterationsSEXP, SEXP sample_sizeSEXP, SEXP min_distanceSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< const int >::type iterations(iterationsSEXP);
+    Rcpp::traits::input_parameter< const size_t >::type sample_size(sample_sizeSEXP);
+    Rcpp::traits::input_parameter< const int >::type min_distance(min_distanceSEXP);
+    rcpp_result_gen = Rcpp::wrap(simulate_panmixia(data, iterations, sample_size, min_distance));
+    return rcpp_result_gen;
+END_RCPP
+}
 // relative_diff
-arma::mat relative_diff(const arma::sp_mat& M);
+arma::vec relative_diff(const arma::sp_mat& M);
 RcppExport SEXP _mclink_relative_diff(SEXP MSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -22,23 +50,40 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// mc_sample_matrix
-std::vector<int> mc_sample_matrix(const arma::sp_mat& M, const size_t sample_size, const int min_distance);
-RcppExport SEXP _mclink_mc_sample_matrix(SEXP MSEXP, SEXP sample_sizeSEXP, SEXP min_distanceSEXP) {
+// ld_decay_chr
+Rcpp::List ld_decay_chr(Rcpp::List data, double maf, int max_dist, int bin_size);
+RcppExport SEXP _mclink_ld_decay_chr(SEXP dataSEXP, SEXP mafSEXP, SEXP max_distSEXP, SEXP bin_sizeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::sp_mat& >::type M(MSEXP);
-    Rcpp::traits::input_parameter< const size_t >::type sample_size(sample_sizeSEXP);
-    Rcpp::traits::input_parameter< const int >::type min_distance(min_distanceSEXP);
-    rcpp_result_gen = Rcpp::wrap(mc_sample_matrix(M, sample_size, min_distance));
+    Rcpp::traits::input_parameter< Rcpp::List >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< double >::type maf(mafSEXP);
+    Rcpp::traits::input_parameter< int >::type max_dist(max_distSEXP);
+    Rcpp::traits::input_parameter< int >::type bin_size(bin_sizeSEXP);
+    rcpp_result_gen = Rcpp::wrap(ld_decay_chr(data, maf, max_dist, bin_size));
+    return rcpp_result_gen;
+END_RCPP
+}
+// interchr_ld_mean
+double interchr_ld_mean(Rcpp::List data, int n_pairs, double maf);
+RcppExport SEXP _mclink_interchr_ld_mean(SEXP dataSEXP, SEXP n_pairsSEXP, SEXP mafSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< int >::type n_pairs(n_pairsSEXP);
+    Rcpp::traits::input_parameter< double >::type maf(mafSEXP);
+    rcpp_result_gen = Rcpp::wrap(interchr_ld_mean(data, n_pairs, maf));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_mclink_mc_sample_rows", (DL_FUNC) &_mclink_mc_sample_rows, 4},
+    {"_mclink_simulate_panmixia", (DL_FUNC) &_mclink_simulate_panmixia, 4},
     {"_mclink_relative_diff", (DL_FUNC) &_mclink_relative_diff, 1},
-    {"_mclink_mc_sample_matrix", (DL_FUNC) &_mclink_mc_sample_matrix, 3},
+    {"_mclink_ld_decay_chr", (DL_FUNC) &_mclink_ld_decay_chr, 4},
+    {"_mclink_interchr_ld_mean", (DL_FUNC) &_mclink_interchr_ld_mean, 3},
     {NULL, NULL, 0}
 };
 
