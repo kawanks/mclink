@@ -1,5 +1,7 @@
 # MCLink
 
+A package for linkage disequilibrium analysis in haploids populations utilizing Monte Carlo techniques. 
+
 ## Development
 
 For development, the [devtools](https://github.com/r-lib/devtools) package is being used, which provides tools for creating, implementing and testing R packages.
@@ -30,8 +32,12 @@ make all functions available again.
 
 ## Functions avaiable for now
 
-- `vcf2matrix`: reads a vcf file and returns a list with the chromossomes, the positions and the genotypes.
+- `vcf2matrix`: reads a vcf file and returns a list with the chromosomes, the positions and the genotypes.
 - `simulate_panmixia`: receives a list, returned by the vcf2matrix function, and returns a list with the first item containing the observed distribution
 obtained after all simulations, the second one containing the simulated panmictic distribution obtained through the permutation of rows in the matrix and the third one
 containing the variances of each simulation respectively.
 - `relative_diff`: receives a sparse matrix and returns a vector with the relative genetic distances of the genetic information that the matrix represents.
+- `ld_decay`: receives a list, returned by the vcf2matrix function, and returns the $r^2$ mean decay with the increasing of the distance em bp along all the genome.
+- `interchr_ld_mean`: receives a list, returned by the vcf2matrix function, and returns the mean of $r^2$ between loci in different chromosomes in the genome.
+- `plot_genetic_distance`: receives a list, returned by the simulate_panmixia function, and plot the comparison of the distribuition of observed relative distances and the distribution of relative distances under simulated panmixia.
+- `plot_association_index`: receives a list, returned by the simulate_panmixia function, and plot the distribution of the association index.
