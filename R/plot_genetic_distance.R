@@ -53,8 +53,8 @@
 #'
 #'
 #' @importFrom ggplot2 ggplot aes geom_histogram geom_line coord_cartesian
-#'   scale_fill_manual scale_color_manual labs theme_classic theme
-#'   element_text element_blank unit facet_wrap after_stat
+#' @importFrom ggplot2 scale_fill_manual scale_color_manual labs theme_classic theme
+#' @importFrom ggplot2 element_text element_blank unit facet_wrap after_stat
 #' @importFrom patchwork plot_layout
 #'
 #'
