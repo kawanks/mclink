@@ -52,8 +52,7 @@
 #'
 #'
 #' @importFrom ggplot2 ggplot aes geom_line geom_vline annotate coord_cartesian
-#'   scale_x_continuous labs theme_classic theme element_text element_blank
-#'   facet_wrap 
+#' @importFrom ggplot2 scale_x_continuous labs theme_classic theme element_text element_blank facet_wrap
 #' @importFrom patchwork plot_layout
 #'
 #'
