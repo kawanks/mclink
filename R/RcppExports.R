@@ -5,7 +5,7 @@
     .Call(`_mclink_mc_sample_rows`, chr, pos, sample_size, min_distance)
 }
 
-simulate_panmixia <- function(data, iterations = 1000L, sample_size = 1000L, min_distance = 1000L) {
+simulate_panmixia <- function(data, iterations = 1000L, sample_size = 1000L, min_distance = 10000L) {
     .Call(`_mclink_simulate_panmixia`, data, iterations, sample_size, min_distance)
 }
 
