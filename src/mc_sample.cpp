@@ -155,9 +155,14 @@ arma::sp_mat mc_shuffle_matrix(const arma::sp_mat &M) {
 
 
 /*
- *  Esta função retorna uma matriz com duas colunas, a primeira coluna são
- *  as distâncias relativas observadas e a segunda coluna são as distâncias
- *  relativas de uma população panmítica.
+ * Generate the distribuitions of the relative genetic distance observed, the distribuition of relative 
+ * genetic distance expect and the distribuition of the standarized association index (Ia)
+ *
+ * @param data a Rcpp list with the genomic data, including positions and chromossomes of the SNPs 
+ * @param iterations number of iterations of the algorithm
+ * @param sample_size number of SNPs to be sampled 
+ * @param min_distance minimum distance (bp) between the SNPs selected
+ * @return a list containing the distribuitions of the relative genetic distance observed and expect, as well the distribuition of the standarized Ia
 */
 // [[Rcpp::export]]
 Rcpp::List simulate_panmixia(Rcpp::List data, const int iterations = 1000, const size_t sample_size = 1000, const int min_distance = 10000){
