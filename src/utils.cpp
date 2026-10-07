@@ -50,7 +50,7 @@ arma::vec relative_diff(const arma::sp_mat &M) {
   for (arma::uword i = 0; i < ncols; ++i) {
     for (arma::uword j = i + 1; j < ncols; ++j) {
       double dist = 1 - hamming_proportion(sign_cols[i], sign_cols[j]);
-      result_vec.push_back(dist);
+      if(dist != 2) result_vec.push_back(dist);
     }
   }
  

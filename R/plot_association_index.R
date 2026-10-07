@@ -52,8 +52,7 @@
 #'
 #'
 #' @importFrom ggplot2 ggplot aes geom_line geom_vline annotate coord_cartesian
-#'   scale_x_continuous labs theme_classic theme element_text element_blank
-#'   facet_wrap 
+#' @importFrom ggplot2 scale_x_continuous labs theme_classic theme element_text element_blank facet_wrap
 #' @importFrom patchwork plot_layout
 #'
 #'
@@ -86,8 +85,7 @@ plot_association_index <- function(
   # Returns mean, median, SD, p-value and x-axis range for plotting
   .calc_stats <- function(result) {
     
-    # Standardise the raw index: sIA = (r - 1) / (n - 1)
-    sia_values <- (result[[3]] - 1) * (1 / (sample_size - 1))
+    sia_values <- result[[3]]
     sia_values <- sia_values[!is.na(sia_values)]
     
     sia_mean <- mean(sia_values)

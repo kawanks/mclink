@@ -11,5 +11,10 @@ A package for linkage disequilibrium calculus using Monte Carlo techniques
 \author{
 \strong{Maintainer}: Kawan Santana \email{kawansantana18@gmail.com}
 
+Authors:
+\itemize{
+  \item Kawan Santana \email{kawansantana18@gmail.com}
+}
+
 }
 \keyword{internal}
