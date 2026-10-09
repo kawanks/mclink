@@ -7,7 +7,6 @@ export(plot_association_index)
 export(plot_genetic_distance)
 export(simulate_panmixia)
 export(vcf2matrix)
-export(vcf_to_sparse)
 importFrom(Matrix,Matrix)
 importFrom(Rcpp,evalCpp)
 importFrom(ggplot2,
