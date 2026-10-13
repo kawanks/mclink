@@ -28,8 +28,16 @@ aggregate_ld_decay <- function(results) {
 }
 
 
+#' Calculate the average LD decay for all chromosomes
+#'
+#' @param vcf a list returned by vcf2matrix function, with the genomic data, 
+#'   including positions and chromossomes of the SNPs
+#' @param max_dist maximum distance to calculate the LD decay
+#' @param maf minimum allele frequency to be used
+#' @param bin_size size of the bins to calculate the decay
+#'
 #' @export
-ld_decay <- function(vcf, maf = 0.05, max_dist = 1e5, bin_size = 500){
+ld_decay <- function(vcf, max_dist = 1e5, maf = 0.05, bin_size = 500){
   
   gt <- vcf[[1]]
   chrs_pos <- vcf[[2]]
@@ -68,11 +76,32 @@ ld_decay <- function(vcf, maf = 0.05, max_dist = 1e5, bin_size = 500){
 #' @method plot mclink_ld_decay
 #' @export
 plot.mclink_ld_decay <- function(x, ...){
-  plot(x$distance / 1e6,
+  old_par <- par(no.readonly = TRUE)
+  on.exit(par(old_par))
+  xmax <- max(x$distance[is.finite(x$mean)], na.rm = TRUE)
+  y_max <- max(x$mean, na.rm = TRUE)
+  
+  par(
+    mar = c(4, 4, 3, 1.6),
+    mgp = c(2.4, 0.5, 0)
+  )
+  
+  plot(x$distance / 1e3,
        x$mean,
+       main = "Average LD decay for all chromosomes",
        type = "l",
-       xlab = "Distance (bp)",
+       xlab = expression("Distance (kb)"),
        ylab = expression(r^2),
+       xlim = c(0, xmax / 1e3),
+       ylim = c(0, ceiling(y_max / 0.05) * 0.05),
+       yaxt = "n",
        ...)
+  
+  axis(
+    side = 2,
+    at = seq(0, ceiling(y_max / 0.05) * 0.05, by = 0.05),
+    las = 1,
+  )
+  
   abline(h = x$interchr_mean, lty = 2)
 }

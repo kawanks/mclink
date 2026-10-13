@@ -5,6 +5,15 @@
     .Call(`_mclink_mc_sample_rows`, chr, pos, sample_size, min_distance)
 }
 
+#' Generate the distribuitions of the relative genetic distance observed, the distribuition of relative 
+#' genetic distance expect and the distribuition of the standarized association index (Ia)
+#'
+#' @param data a Rcpp list with the genomic data, including positions and chromossomes of the SNPs 
+#' @param iterations number of iterations of the algorithm
+#' @param sample_size number of SNPs to be sampled 
+#' @param min_distance minimum distance (bp) between the SNPs selected
+#' @return a list containing the distribuitions of the relative genetic distance observed and expect, as well the distribuition of the standarized Ia
+#' @export
 simulate_panmixia <- function(data, iterations = 1000L, sample_size = 1000L, min_distance = 10000L) {
     .Call(`_mclink_simulate_panmixia`, data, iterations, sample_size, min_distance)
 }
