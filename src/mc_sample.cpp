@@ -50,6 +50,7 @@ std::vector<int> mc_sample_rows(const std::vector<int>& chr,
     rows.erase(lower, upper);
   }
 
+  if(sample.size() < sample_size) Rcpp::warning("The target sample size was not reached in this iteration, was possible to sample %i SNPs.", sample.size());
 
   // Since R starts the index of the vectors in 1 is needed to add 1 on the sample vector to return
   std::for_each(sample.begin(), sample.end(), [](int &n){
