@@ -1,14 +1,14 @@
-#' Plot the Standardised Index of Association (sIA)
+#' Plot the Standardised Index of Association (rd)
 #'
 #' Plots the null distribution of the standardised index of association
-#' (sIA) against the panmictic expectation (sIA = 0). 
+#' (rd) against the panmictic expectation (rd = 0). 
 #' Supports genome-wide, per-chromosome, panel, and batch plots from 
 #' \code{distances_by_chr()} or \code{simulate_panmixia()} results.
 #'
 #'
 #' @param result      A list returned by \code{simulate_panmixia()} or
 #'                    \code{distances_by_chr()}.
-#' @param sample_size Integer. Number of samples used to compute sIA.
+#' @param sample_size Integer. Number of SNPs sampled per iteration.
 #'                    Auto-detected from \code{result} when available. 
 #'                    Default: \code{1000L}.
 #' @param statistics  If \code{TRUE}, adds median, SD and p-value to the plot.
@@ -16,9 +16,6 @@
 #' @param chr         Character or integer. Name or index of a single chromosome to plot. 
 #'                    Requires a \code{distances_by_chr()} result. 
 #'                    Default: \code{NULL}.
-#' @param panel       Logical. If \code{TRUE}, returns genome plot on top with 
-#' all chromosomes faceted below. 
-#'                    Default: \code{FALSE}. 
 #' @param all_results If \code{TRUE}, generates one plot per entry (genome + chromosomes).
 #'                    Default: \code{FALSE}.
 #' @param title       If \code{TRUE}, adds an auto-generated title.

@@ -15,9 +15,6 @@
 #' @param chr         Character or integer. Name or index of a single chromosome to plot. 
 #'                    Requires a \code{distances_by_chr()} result. 
 #'                    Default: \code{NULL}.
-#' @param panel       Logical. If \code{TRUE}, returns genome plot on top with 
-#' all chromosomes faceted below. 
-#'                    Default: \code{FALSE}.
 #' @param all_results If \code{TRUE}, generates one plot per entry (genome + chromosomes).
 #'                    Default: \code{FALSE}.
 #' @param title       If \code{TRUE}, adds an auto-generated title.
@@ -66,7 +63,6 @@ plot_genetic_distance <- function(
     bw               = 0.6,
     binwidth         = 0.7,
     chr              = NULL,
-    panel            = FALSE,
     all_results      = FALSE,
     title            = FALSE,
     custom_title     = NULL,
@@ -87,7 +83,7 @@ plot_genetic_distance <- function(
     panmictic_data <- panmictic_data[!is.na(panmictic_data)]
     
     # Set axis limits from data range or user-supplied xlim
-    x_lower <- if (is.null(xlim)) min(c(observed_data, panmictic_data)) else xlim[1]
+    x_lower <- if (is.null(xlim)) 0 else xlim[1]
     x_upper <- if (is.null(xlim)) max(c(observed_data, panmictic_data)) else xlim[2]
     
     # Clip observed values to axis range
@@ -151,6 +147,7 @@ plot_genetic_distance <- function(
         legend.justification = c(1, 1),
         legend.spacing.y     = unit(0, "pt"),
         legend.text          = element_text(size = 12),
+        axis.line.y          = element_blank(),
         axis.text.y          = element_blank(), 
         axis.ticks.y         = element_blank(),
         axis.text            = element_text(size = 14),
@@ -196,6 +193,7 @@ plot_genetic_distance <- function(
     message("Saved: ", file_path)
   }    
   
+  
 # 'all_results': 
 # One plot per chromosome + genome, saved individually
   if (all_results) {
@@ -221,82 +219,6 @@ plot_genetic_distance <- function(
     }
     
     return(invisible(plot_list))
-  }
-  
-
-# 'panel':
-# Genome plot on top, all chromosomes faceted below
-  if (panel) {
-    if (is.null(result$chromosomes))
-      stop("`panel = TRUE` requires a result from distances_by_chr().")
-    if (is.null(result$genome))
-      stop("result$genome is NULL. Run distances_by_chr() with genome = TRUE.")
-    
-    chr_labels <- names(result$chromosomes)
-    genome_plot <- .build_single_plot(result$genome, chr_label = NULL, show_x_axis = FALSE)
-    
-    # Prepare data for all chromosomes and find a shared x range:
-    chr_data_list <- lapply(chr_labels, function(chr_name)
-      .prepare_plot_data(result$chromosomes[[chr_name]], xlim))
-    
-    shared_x_lower <- min(sapply(chr_data_list, `[[`, "x_lower"))
-    shared_x_upper <- max(sapply(chr_data_list, `[[`, "x_upper"))
-    
-    # Combine observed distances from all chromosomes into one data frame:
-    combined_observed_df <- do.call(rbind, lapply(chr_labels, function(chr_name) {
-      chr_data <- .prepare_plot_data(result$chromosomes[[chr_name]], xlim)
-      data.frame(distance = chr_data$observed_df$distance, chromosome = chr_name)
-    }))
-    
-    # Compute per-chromosome panmictic density curves on the shared x range:
-    combined_panmictic_df <- do.call(rbind, lapply(chr_labels, function(chr_name) {
-      panmictic_data <- result$chromosomes[[chr_name]][[2]] * 100
-      panmictic_data <- panmictic_data[!is.na(panmictic_data)]
-      dens <- density(panmictic_data, 
-                      bw   = bw,
-                      from = shared_x_lower, 
-                      to   = shared_x_upper, 
-                      n    = 256)
-      data.frame(x = dens$x, y = dens$y, chromosome = chr_name)
-    }))
-    
-    # Preserve chromosome order in facets
-    combined_observed_df$chromosome  <- factor(combined_observed_df$chromosome,  levels = chr_labels)
-    combined_panmictic_df$chromosome <- factor(combined_panmictic_df$chromosome, levels = chr_labels)
-    
-    chr_facet_plot <- ggplot(combined_observed_df, aes(x = distance)) +
-      
-      geom_histogram(
-        aes(y = after_stat(density), fill = "Observed"),
-        binwidth = binwidth * 1.5, color = "black", alpha = 0.6
-      ) +
-      geom_line(
-        data = combined_panmictic_df,
-        aes(x = x, y = y, color = "Panmictic"),
-        linewidth = 0.6, inherit.aes = FALSE
-      ) +
-      coord_cartesian(xlim = c(shared_x_lower, shared_x_upper)) +
-      scale_fill_manual(values  = c("Observed"  = "skyblue3"), name = NULL) +
-      scale_color_manual(values = c("Panmictic" = "#E67E22"),  name = NULL) +
-      labs(x = "Genetic distance (%)", y = "Density") +
-      facet_wrap(~ chromosome, ncol = 7) +
-      
-      theme_classic(base_family = "Times", base_size = 14) +
-      theme(
-        legend.position  = "none",
-        axis.text.y      = element_blank(),
-        axis.ticks.y     = element_blank(),
-        axis.text        = element_text(size = 12),
-        axis.title       = element_text(size = 14),
-        strip.background = element_rect(fill = "grey85", color = "grey70"),
-        strip.text       = element_text(size = 12),
-        panel.border     = element_rect(color = "black", fill = NA)
-      )
-  
-    final_panel <- genome_plot / chr_facet_plot + plot_layout(heights = c(3, 2))
-    
-    if (save) .save_plot_to_file(final_panel)
-    return(final_panel)
   }
   
   
