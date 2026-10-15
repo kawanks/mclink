@@ -1,18 +1,28 @@
 #' Read a vcf file and returns a list with the chromossomes, the positions and the genotypes
 #'
 #' @param path path to vcf file
-#' @param chromNumber number of the chromosome of interest (optional)
+#' @param chr_num number of the chromosome of interest (optional)
+#' @param ref genomic reference to use
+#' @param limit memory limit to use to read the file
 #' @return list with the chromossomes, the positions of the SNPs and a sparse matrix with the genotypes of the vcf file
 #' @importFrom vcfR read.vcfR getCHROM getPOS
 #' @importFrom Matrix Matrix
 #' @export
-vcf2matrix <- function(path, chromNumber = 0) {
-  vcf <- read.vcfR(path)
+vcf2matrix <- function(path, chr_num = 0, ref = NULL, limit = NULL) {
 
-  if (chromNumber != 0) vcf <- get_chromosome(vcf, chromNumber)
+  vcf <- if(!is.null(limit)) read.vcfR(path, limit = limit) else read.vcfR(path)
 
+  if (chr_num != 0) vcf <- get_chromosome(vcf, chr_num)
 
-  chrs <- getCHROM(vcf) |> factor() |> as.integer()
+  chrs <- getCHROM(vcf)
+  
+  if(!is.null(ref)){
+    keep <- startsWith(chrs, ref)
+    vcf <- vcf[keep, ]
+  }
+
+  chrs <- chrs |> factor() |> as.integer()
+
   pos <- getPOS(vcf)
 
   geno <- extract.gt(vcf, element = "GT", as.numeric = TRUE)
@@ -28,13 +38,13 @@ vcf2matrix <- function(path, chromNumber = 0) {
 #' Assume that the vcf file is sorted by chromosome.
 #'
 #' @param vcf vcf file
-#' @param chromNumber number of the chromoseme of interest
+#' @param chr_num number of the chromoseme of interest
 #' @return vcf object with just the chromosome chosen
 #' @importFrom vcfR extract.gt getCHROM
-get_chromosome <- function(vcf, chromNumber) {
+get_chromosome <- function(vcf, chr_num) {
   chromosome <- getCHROM(vcf) |>
     unique() |>
-    (\(.) .[chromNumber])()
+    (\(.) .[chr_num])()
 
   if (is.na(chromosome)) stop("Chromosome out of the range of chromosomes avaliable.")
   idx <- vcf@fix[, "CHROM"] == chromosome
