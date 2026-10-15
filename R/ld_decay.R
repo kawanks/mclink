@@ -1,4 +1,4 @@
-aggregate_ld_decay <- function(results) {
+aggregate_ld_decay <- function(results, chr) {
   
   n_bins <- length(results[[1]]$distance)
   
@@ -19,11 +19,14 @@ aggregate_ld_decay <- function(results) {
   
   idx <- total_count > 0
   mean[idx] <- total_sum[idx] / total_count[idx]
+
+  main <- if(is.null(chr)) "Average LD decay for all chromosomes" else paste0("Average LD decay in the chromosome ", chr)
   
   list(
     distance = results[[1]]$distance,
     mean  = mean,
-    count    = total_count
+    count    = total_count,
+    main = main
   )
 }
 
@@ -31,21 +34,28 @@ aggregate_ld_decay <- function(results) {
 #' Calculate the average LD decay for all chromosomes
 #'
 #' @param vcf a list returned by vcf2matrix function, with the genomic data, 
-#'   including positions and chromossomes of the SNPs
+#'   including positions and chromosomes of the SNPs
+#' @param chr chromosome number to be calculate the LD decay
 #' @param max_dist maximum distance to calculate the LD decay
 #' @param maf minimum allele frequency to be used
 #' @param bin_size size of the bins to calculate the decay
 #'
 #' @export
-ld_decay <- function(vcf, max_dist = 1e5, maf = 0.05, bin_size = 500){
+ld_decay <- function(vcf, chr = NULL, max_dist = 1e5, maf = 0.05, bin_size = 500){
   
   gt <- vcf[[1]]
   chrs_pos <- vcf[[2]]
   pos <- vcf[[3]]
   
-  chrs <- unique(chrs_pos)
-  
-  print("Calculating r² in the chromossomes...")
+
+  if(is.null(chr)){
+    chrs <- unique(chrs_pos)
+    print("Calculating r² in the chromosomes...")
+  }else{
+    chrs <- chr
+    paste0("Calculating r² in the chromosome ", chrs, "...") |> print()
+  }
+
   results <- lapply(chrs, function(chr){
     
     idx <- chrs_pos == chr
@@ -56,9 +66,9 @@ ld_decay <- function(vcf, max_dist = 1e5, maf = 0.05, bin_size = 500){
     ld_decay_chr(list(gt_chr, pos_chr), maf, max_dist, bin_size)
   })
   
-  res <- aggregate_ld_decay(results)
+  res <- aggregate_ld_decay(results, chr)
   
-  print("Calculating the interchromossome r² mean...")
+  print("Calculating the interchromosome r² mean...")
   inter <- interchr_ld_mean(vcf)
   
   res <- append(res, list(interchr_mean = inter))
@@ -88,7 +98,7 @@ plot.mclink_ld_decay <- function(x, ...){
   
   plot(x$distance / 1e3,
        x$mean,
-       main = "Average LD decay for all chromosomes",
+       main = x$main,
        type = "l",
        xlab = expression("Distance (kb)"),
        ylab = expression(r^2),
