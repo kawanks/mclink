@@ -52,11 +52,13 @@ get_distributions <- function(data,
                                            sample_size = sample_size,
                                            min_distance = min_distance)
 
-      result_genome <- simulate_panmixia(data,
-                                         iterations   = iterations,
-                                         sample_size  = sample_size,
-                                         min_distance = min_distance)
     }
+
+    cat("Processing the whole genome\n")
+    result_genome <- simulate_panmixia(data,
+                                       iterations   = iterations,
+                                       sample_size  = sample_size,
+                                       min_distance = min_distance)
   }else{
       if (!(chr %in% chr_unique)) 
          paste("The chromosome number is not valid, should be between chromosomes", min(chr_unique), "and", max(chr_unique)) |> stop()
@@ -75,7 +77,34 @@ get_distributions <- function(data,
       result_genome = NULL
   }
 
-  list(genome      = result_genome,
+  distributions <- list(genome      = result_genome,
        chromosomes = result_chr,
        sample_size = sample_size) 
+
+  class(distributions) <- "mclink_get_distributions"
+
+  distributions
+}
+
+
+#' Plot genetic distances got by get_distributions function 
+#'
+#' @param result object returned by get_distributions()
+#' @param chr chromosome to be ploted
+#' @param ... extended parameters
+#'
+#' @method plot mclink_get_distributions
+#' @export
+plot.mclink_get_distributions <- function(result, chr = NULL, ...){
+  if(!is.null(chr)){
+    plot_genetic_distance(result, chr = chr) |> print()
+  }
+
+  else if(!is.null(result$genome)){
+    plot_genetic_distance(result$genome) |> print()
+  }else{
+    for (i in seq_along(result$chromosomes)) {
+      if(!is.null(result$chromosomes[[i]])) plot_genetic_distance(result, chr = i) |> print()
+    }
+  }
 }

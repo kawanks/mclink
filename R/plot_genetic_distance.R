@@ -68,7 +68,7 @@ plot_genetic_distance <- function(
     chr              = NULL,
     panel            = FALSE,
     all_results      = FALSE,
-    title            = FALSE,
+    title            = TRUE,
     custom_title     = NULL,
     xlim             = NULL,
     save             = FALSE,
@@ -171,11 +171,6 @@ plot_genetic_distance <- function(
     scope_label <- if (is.null(chr_label)) "Genome"             else
       if (is.numeric(chr_label)) paste("Chromosome", chr_label) else
         chr_label
-    
-    bquote(atop(
-      "Relative genetic distance (%)",
-      bold(.(scope_label))
-    ))
   }
   
   
