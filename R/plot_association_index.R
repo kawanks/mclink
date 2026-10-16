@@ -1,14 +1,14 @@
-#' Plot the Standardised Index of Association (sIA)
+#' Plot the Standardised Index of Association (rd)
 #'
 #' Plots the null distribution of the standardised index of association
-#' (sIA) against the panmictic expectation (sIA = 0). 
+#' (rd) against the panmictic expectation (rd = 0). 
 #' Supports genome-wide, per-chromosome, panel, and batch plots from 
 #' \code{distances_by_chr()} or \code{simulate_panmixia()} results.
 #'
 #'
 #' @param result      A list returned by \code{simulate_panmixia()} or
 #'                    \code{distances_by_chr()}.
-#' @param sample_size Integer. Number of samples used to compute sIA.
+#' @param sample_size Integer. Number of SNPs sampled per iteration.
 #'                    Auto-detected from \code{result} when available. 
 #'                    Default: \code{1000L}.
 #' @param statistics  If \code{TRUE}, adds median, SD and p-value to the plot.
@@ -16,45 +16,31 @@
 #' @param chr         Character or integer. Name or index of a single chromosome to plot. 
 #'                    Requires a \code{distances_by_chr()} result. 
 #'                    Default: \code{NULL}.
-#' @param panel       Logical. If \code{TRUE}, returns genome plot on top with 
-#' all chromosomes faceted below. 
-#'                    Default: \code{FALSE}. 
-#' @param all_results If \code{TRUE}, generates one plot per entry (genome + chromosomes).
-#'                    Default: \code{FALSE}.
 #' @param title       If \code{TRUE}, adds an auto-generated title.
 #'                    Default: \code{FALSE}.
-#' @param custom_title Custom title string, overrides \code{title}. 
-#'                    Default: \code{NULL}.
 #' @param save        If \code{TRUE}, saves the plot to \code{filename}.
 #'                    Default: \code{FALSE}.
 #' @param filename    Output filename. 
 #'                    Default: \code{"plot_sIA"}
 #'
 #'
-#'@return A \code{ggplot} object, a \code{patchwork} object (when
-#'   \code{panel = TRUE}), or an invisible named list of \code{ggplot} objects
-#'   (when \code{all_results = TRUE}).
-#'   
+#'@return A \code{ggplot} object.
 #'
 #' @details
-#' Four plotting modes are available, evaluated in the following order:
+#' Three plotting modes are available, evaluated in the following order:
 #' \enumerate{
-#'   \item \strong{Default}: Genome plot, or a plain \code{simulate_panmixia()} 
-#'   result.
+#'   \item \strong{Default}: Genome plot.
 #'   \item \strong{Single chromosome} (\code{chr}): Plot for one chromosome,
 #'     selected by name or index.
-#'   \item \strong{All results} (\code{all_results = TRUE}): Generates one plot
-#'     per entry (genome + each chromosome), printing and optionally saving each
+#'   \item \strong{All} (\code{chr = "all"}): Generates one plot
+#'     per entry (each chromosome), printing and optionally saving each
 #'     individually.
-#'   \item \strong{Panel} (\code{panel = TRUE}): Stacked figure with the
-#'     genome plot on top and all chromosomes faceted below.
 #' }
 #'
 #'
 #' @importFrom ggplot2 ggplot aes geom_line geom_vline annotate coord_cartesian
 #' @importFrom ggplot2 scale_x_continuous labs theme_classic theme element_text element_blank facet_wrap
-#' @importFrom patchwork plot_layout
-#'
+#' 
 #'
 #' @export
 
@@ -64,12 +50,9 @@ plot_association_index <- function(
     sample_size  = 1000L,
     statistics   = FALSE,
     chr          = NULL,
-    panel        = FALSE,
-    all_results  = FALSE,
     title        = FALSE,
-    custom_title = NULL,
     save         = FALSE,
-    filename     = "plot_sIA"
+    filename     = "plot_rd"
 ) {
   
   
@@ -81,49 +64,51 @@ plot_association_index <- function(
   }
   
   
-# Compute sIA statistics from a result entry:
+# Compute rd statistics from a result entry:
   # Returns mean, median, SD, p-value and x-axis range for plotting
   .calc_stats <- function(result) {
     
-    sia_values <- result[[3]]
-    sia_values <- sia_values[!is.na(sia_values)]
+    rd_values <- result[[3]]
+    rd_values <- rd_values[!is.na(rd_values)]
     
-    sia_mean <- mean(sia_values)
-    sia_sd   <- sd(sia_values)
+    rd_mean <- mean(rd_values)
+    rd_sd   <- sd(rd_values)
     
     # P-value: 
-    sia_p <- pnorm(0, mean = sia_mean, sd = sia_sd, lower.tail = TRUE)
+    rd_p <- pnorm(0, mean = rd_mean, sd = rd_sd, lower.tail = TRUE)
     
     list(
-      values = sia_values,
-      mean   = sia_mean,
-      median = median(sia_values),
-      sd     = sia_sd,
-      p      = sia_p,
-      x_upper = sia_mean + 4 * sia_sd,
-      x_lower = min(0, sia_mean - 4 * sia_sd)
+      values = rd_values,
+      mean   = rd_mean,
+      median = median(rd_values),
+      sd     = rd_sd,
+      p      = rd_p,
+      x_upper = rd_mean + 4 * rd_sd,
+      x_lower = min(0, rd_mean - 4 * rd_sd)
+    #  x_upper = quantile(rd_values, 0.995, na.rm = TRUE),
+    #  x_lower = quantile(rd_values, 0.005, na.rm = TRUE)
     )
   }
   
 # Format p-value for display:
 # Returns a list with a formatted label and a significance flag
   .format_pvalue <- function(p) {
-    list(
-      label = if (p < 0.001) format(p, scientific = TRUE, digits = 2) else as.character(round(p, 4)),
-      sig   = if (p >= 0.05) "*" else ""
-    )
+    if (is.null(p) || length(p) == 0 || is.na(p)) return("NA")
+    if (p < 0.001) format(p, scientific = TRUE, digits = 2) else as.character(round(p, 4))
   }
   
   
-# sIA plot:
-# Gaussian curve fitted to sIA values with a vertical panmixia reference line
+# rd plot:
+# Gaussian curve fitted to rd values with a vertical panmixia reference line
 
-# 'show_x_axis': Hide x-axis label when stacking plots in a panel
-  .build_single_plot <- function(stats, chr_label = NULL, show_x_axis = TRUE) {
+  .build_single_plot <- function(stats, 
+                                 chr_label   = NULL,
+                                 show_x_axis = TRUE,
+                                 title       = TRUE) {
     pf      <- .format_pvalue(stats$p)
     x_range <- seq(stats$x_lower, stats$x_upper, length.out = 1000)
     
-    # Fitted normal distribution over the sIA range
+    # Fitted normal distribution over the rd range
     gaussian_df <- data.frame(
       x = x_range,
       y = dnorm(x_range, mean = stats$mean, sd = stats$sd)
@@ -135,18 +120,18 @@ plot_association_index <- function(
         data = gaussian_df, aes(x = x, y = y),
         color = "#3A7EBF", linewidth = 0.7, inherit.aes = FALSE
       ) +
-      # Vertical reference line at sIA = 0 (panmixia)
+      # Vertical reference line at rd = 0 (panmixia)
       geom_vline(xintercept = 0, linetype = "dashed", color = "red") +
       annotate(
         "text", x = 0, y = Inf, vjust = 1.5, hjust = -0.1,
-        label = "Panmixia~(I[A]^S == 0)", parse = TRUE,
+        label = "Panmixia~(bar(r)[d] == 0)", parse = TRUE,
         color = "red", size = 3.8, family = "Times"
       ) +
       scale_x_continuous(expand = c(0.02, 0)) +
       coord_cartesian(xlim = c(0, stats$x_upper)) +
       labs(
         title = .build_plot_title(chr_label),
-        x     = if (show_x_axis) expression(I[A]^S) else NULL,
+        x     = if (show_x_axis) expression(bar(r)[d]) else NULL,
         y     = "Density"
       ) +
       theme_classic(base_family = "Times") +
@@ -155,6 +140,7 @@ plot_association_index <- function(
                                     family = "Times", size = 12),
         axis.text.y  = element_blank(),
         axis.ticks.y = element_blank(),
+        axis.line.y  = element_blank(),
         axis.title   = element_text(size = 14),
         axis.text    = element_text(size = 14)
       )
@@ -169,7 +155,7 @@ plot_association_index <- function(
         label = paste0(
           "Median:  ", round(stats$median, 6), "\n",
           "SD:         ", round(stats$sd,     6), "\n",
-          "p-value: ",   pf$label
+          "p-value: ",   pf
         )
       )
     p
@@ -178,18 +164,18 @@ plot_association_index <- function(
 # Build the plot title:
 # Returns NULL (no title), a custom string or an auto-generated label depending on the 'title' and 'custom_title' arguments
   .build_plot_title <- function(chr_label = NULL) {
-    if (!is.null(custom_title)) return(custom_title)   # User-supplied title
-    if (!isTRUE(title))         return(NULL)           # No title requested
+    if (!is.null(chr_label)){            
+      
+      # Auto-generate a label based on the chromosome argument
+      scope_label <- if (is.numeric(chr_label)) paste("Chromosome", chr_label) else chr_label
+      return(bquote(bold(.(scope_label))
+      ))
+    }
     
-    # Auto-generate a label based on the chromosome argument
-    scope_label <- if (is.null(chr_label)) "Genome"             else
-      if (is.numeric(chr_label)) paste("Chromosome", chr_label) else
-        chr_label
-    bquote(atop(
-      "Standardised Index of Association (" * I[A]^S * ")",
-      bold(.(scope_label))
-    ))
-  }
+    if (!isTRUE(title)) return(NULL)
+    bquote(bold("Genome")
+    )
+  } 
   
   
   # Print summary statistics to the console
@@ -197,135 +183,71 @@ plot_association_index <- function(
     pf <- .format_pvalue(stats$p)
     cat(sprintf(
       "%-15s | Median: %10.6f | SD: %10.6f | p-value: %s\n",
-      label, stats$median, stats$sd, pf$label
+      label, stats$median, stats$sd, pf
     ))
   }
   
   
-# Save a finished plot:
-# Builds the filename from 'filename' and an optional label suffix (e.g. chromosome name)
+  # Save a finished plot:
+  # Builds the filename from 'filename' and an optional label suffix (e.g. chromosome name)
   .save_plot_to_file <- function(plot_object, label = NULL) {
     suffix    <- if (!is.null(label)) paste0("_", gsub(" ", "_", label)) else ""
     file_path <- paste0(filename, suffix, ".tiff")
-    ggsave(
+    
+    if (is.null(file_path) || nchar(file_path) == 0)
+      stop("Invalid file path: ", file_path)
+    
+    dir_path <- dirname(file_path)
+    if (dir_path != ".") { 
+      dir.create(dir_path, showWarnings = FALSE, recursive = TRUE)
+    }
+    
+    ggplot2::ggsave(
       file_path, plot_object,
-      width  = 7,
-      height = 4,
+      width  = 7, 
+      height = 4, 
       units  = "in",
       dpi    = 600,
-      scale  = 1.5,
+      scale  = 1.5, 
       compression = "lzw"
     )
     message("Saved: ", file_path)
-  }
-  
-  
-# 'all_results': 
-# One plot per chromosome + genome, saved individually
-  if (all_results) {
-    if (is.null(result$chromosomes))
-      stop("'all_results = TRUE' requires a result from distances_by_chr().")
-    
-    message("Generating plots...")
-    
-    # Merge genome and per-chromosome entries into a single named list
-    all_entries      <- c(
-      if (!is.null(result$genome)) list(Genome = result$genome) else NULL,
-      result$chromosomes
-    )
-    plot_list        <- vector("list", length(all_entries))
-    names(plot_list) <- names(all_entries)
-    
-    for (entry_label in names(all_entries)) {
-      chr_label              <- if (entry_label == "Genome") NULL else entry_label
-      stats                  <- .calc_stats(all_entries[[entry_label]])
-      .print_stats(stats, entry_label)
-      p                      <- .build_single_plot(stats, chr_label)
-      plot_list[[entry_label]] <- p
-      print(p)
-      if (save) .save_plot_to_file(p, label = entry_label)
-    }
-    
-    return(invisible(plot_list))
-  }
-  
-  
-# 'panel':
-# Genome plot on top, all chromosomes faceted below
-  if (panel) {
-    if (is.null(result$chromosomes))
-      stop("'panel = TRUE' requires a result from distances_by_chr().")
-    if (is.null(result$genome))
-      stop("result$genome is NULL. Run distances_by_chr() with genome = TRUE.")
-    
-    chr_labels  <- names(result$chromosomes)
-    genome_stats <- .calc_stats(result$genome)
-    chr_stats    <- lapply(result$chromosomes, .calc_stats)
-    
-    # Shared x upper limit across all chromosomes
-    shared_x_upper <- max(sapply(chr_stats, `[[`, "x_upper"))
-    
-    # Genome plot (x-axis label hidden to save space)
-    genome_plot <- .build_single_plot(genome_stats, chr_label = NULL, show_x_axis = FALSE)
-    
-    # Combine sIA values from all chromosomes into one data frame
-    combined_values_df <- do.call(rbind, lapply(chr_labels, function(chr_name)
-      data.frame(values = chr_stats[[chr_name]]$values, chromosome = chr_name)
-    ))
-    
-    # Compute per-chromosome Gaussian curves on the shared x range
-    combined_gaussian_df <- do.call(rbind, lapply(chr_labels, function(chr_name) {
-      st      <- chr_stats[[chr_name]]
-      x_range <- seq(st$x_lower, shared_x_upper, length.out = 512)
-      data.frame(
-        x          = x_range,
-        y          = dnorm(x_range, mean = st$mean, sd = st$sd),
-        chromosome = chr_name
-      )
-    }))
-    
-    # Preserve chromosome order in facets
-    combined_values_df$chromosome   <- factor(combined_values_df$chromosome,   levels = chr_labels)
-    combined_gaussian_df$chromosome <- factor(combined_gaussian_df$chromosome, levels = chr_labels)
-    
-    x_breaks <- pretty(c(0, shared_x_upper), n = 2)
-    
-    chr_facet_plot <- ggplot(combined_values_df, aes(x = values)) +
-      geom_line(
-        data = combined_gaussian_df, aes(x = x, y = y),
-        color = "#3A7EBF", linewidth = 0.6, inherit.aes = FALSE
-      ) +
-      geom_vline(xintercept = 0, linetype = "dashed", color = "red") +
-      coord_cartesian(xlim = c(0, shared_x_upper)) +
-      scale_x_continuous(expand = c(0.02, 0), breaks = x_breaks) +
-      labs(x = expression(I[A]^S), y = "Density") +
-      facet_wrap(~ chromosome, ncol = 7) +
-      theme_classic(base_family = "Times") +
-      theme(
-        axis.text.y      = element_blank(),
-        axis.ticks.y     = element_blank(),
-        axis.text        = element_text(size = 12),
-        axis.title       = element_text(size = 14),
-        strip.background = element_rect(fill = "grey85", color = "grey70"),
-        strip.text       = element_text(size = 12),
-        panel.border     = element_rect(color = "black", fill = NA)
-      )
-    
-    # Stack genome (top) and chromosome facets (bottom) with proportional heights
-    final_panel <- genome_plot / chr_facet_plot + plot_layout(heights = c(4, 2))
-    
-    if (save) .save_plot_to_file(final_panel)
-    return(final_panel)
-  }
-  
-  
+  }   
+
+
 # 'chr': 
-# Plot for a single chromosome from 'distances_by_chr()' 
+# Single or all chromosomes 
   if (!is.null(chr)) {
     if (is.null(result$chromosomes))
       stop("'chr' requires a result from distances_by_chr().")
     
     chr_labels <- names(result$chromosomes)
+    
+    # chr = "all": One plot per chromosome, saved individually
+    if (chr == "all") {
+      message("Generating plots...")
+      
+      chr_entries      <- Filter(Negate(is.null), result$chromosomes)
+      plot_list        <- vector("list", length(chr_entries))
+      names(plot_list) <- names(chr_entries)
+      
+      for (entry_label in names(chr_entries)) {
+        stats                  <- .calc_stats(chr_entries[[entry_label]])
+        .print_stats(stats, entry_label)
+        
+        p <- .build_single_plot(stats,
+                                chr_label = entry_label,
+                                title     = TRUE)
+        
+        plot_list[[entry_label]] <- p
+        print(p)
+        
+        if(save) .save_plot_to_file(p, 
+                                    label = entry_label)
+      }
+      
+      return(invisible(plot_list))
+    }
     
     # Accept chromosome by index (integer) or by name (string)
     target_chr <- if (is.numeric(chr)) {
@@ -341,14 +263,19 @@ plot_association_index <- function(
     
     stats <- .calc_stats(result$chromosomes[[target_chr]])
     .print_stats(stats, target_chr)
-    p <- .build_single_plot(stats, chr_label = target_chr)
-    if (save) .save_plot_to_file(p, label = target_chr)
+    p <- .build_single_plot(stats, 
+                            chr_label = target_chr,
+                            title     = TRUE)
+    
+    if (save) .save_plot_to_file(p, 
+                                 label = target_chr)
+    
     return(p)
   }
   
   
 # Default:
-# Genome plot or 'simulate_panmixia()' result
+# Genome plot
   genome_entry <- if (!is.null(result$chromosomes)) result$genome else result
   stats <- .calc_stats(genome_entry)
   .print_stats(stats, "Genome")
