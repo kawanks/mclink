@@ -4,11 +4,13 @@
 \alias{ld_decay}
 \title{Calculate the average LD decay for all chromosomes}
 \usage{
-ld_decay(vcf, max_dist = 1e+05, maf = 0.05, bin_size = 500)
+ld_decay(vcf, chr = NULL, max_dist = 1e+05, maf = 0.05, bin_size = 500)
 }
 \arguments{
 \item{vcf}{a list returned by vcf2matrix function, with the genomic data, 
-including positions and chromossomes of the SNPs}
+including positions and chromosomes of the SNPs}
+
+\item{chr}{chromosome number to be calculate the LD decay}
 
 \item{max_dist}{maximum distance to calculate the LD decay}
 

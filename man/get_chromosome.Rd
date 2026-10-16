@@ -5,12 +5,12 @@
 \title{Get the chromosome of interest.
 Assume that the vcf file is sorted by chromosome.}
 \usage{
-get_chromosome(vcf, chromNumber)
+get_chromosome(vcf, chr_num)
 }
 \arguments{
 \item{vcf}{vcf file}
 
-\item{chromNumber}{number of the chromoseme of interest}
+\item{chr_num}{number of the chromoseme of interest}
 }
 \value{
 vcf object with just the chromosome chosen

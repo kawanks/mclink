@@ -13,7 +13,6 @@
 #' @param sample_size number of SNPs to be sampled 
 #' @param min_distance minimum distance (bp) between the SNPs selected
 #' @return a list containing the distribuitions of the relative genetic distance observed and expect, as well the distribuition of the standarized Ia
-#' @export
 simulate_panmixia <- function(data, iterations = 1000L, sample_size = 1000L, min_distance = 10000L) {
     .Call(`_mclink_simulate_panmixia`, data, iterations, sample_size, min_distance)
 }

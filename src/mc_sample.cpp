@@ -50,6 +50,7 @@ std::vector<int> mc_sample_rows(const std::vector<int>& chr,
     rows.erase(lower, upper);
   }
 
+  if(sample.size() < sample_size) Rcpp::warning("The target sample size was not reached in this iteration, was possible to sample %i SNPs.", sample.size());
 
   // Since R starts the index of the vectors in 1 is needed to add 1 on the sample vector to return
   std::for_each(sample.begin(), sample.end(), [](int &n){
@@ -162,7 +163,6 @@ arma::sp_mat mc_shuffle_matrix(const arma::sp_mat &M) {
 //' @param sample_size number of SNPs to be sampled 
 //' @param min_distance minimum distance (bp) between the SNPs selected
 //' @return a list containing the distribuitions of the relative genetic distance observed and expect, as well the distribuition of the standarized Ia
-//' @export
 // [[Rcpp::export]]
 Rcpp::List simulate_panmixia(Rcpp::List data, const int iterations = 1000, const size_t sample_size = 1000, const int min_distance = 10000){
   Rcpp::S4 geno = data[0];
