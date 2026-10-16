@@ -4,12 +4,16 @@
 \alias{vcf2matrix}
 \title{Read a vcf file and returns a list with the chromossomes, the positions and the genotypes}
 \usage{
-vcf2matrix(path, chromNumber = 0)
+vcf2matrix(path, chr_num = 0, ref = NULL, limit = NULL)
 }
 \arguments{
 \item{path}{path to vcf file}
 
-\item{chromNumber}{number of the chromosome of interest (optional)}
+\item{chr_num}{number of the chromosome of interest (optional)}
+
+\item{ref}{genomic reference to use}
+
+\item{limit}{memory limit to use to read the file}
 }
 \value{
 list with the chromossomes, the positions of the SNPs and a sparse matrix with the genotypes of the vcf file
