@@ -16,7 +16,7 @@
 #' @export
 
 
-get_distributions <- function(data, 
+genetic_distribution <- function(data, 
                              chr = "all",
                              iterations = 1000,
                              sample_size = 1000,
@@ -81,21 +81,21 @@ get_distributions <- function(data,
        chromosomes = result_chr,
        sample_size = sample_size) 
 
-  class(distributions) <- "mclink_get_distributions"
+  class(distributions) <- "mclink_genetic_distribution"
 
   distributions
 }
 
 
-#' Plot genetic distances got by get_distributions function 
+#' Plot genetic distances got by genetic_distribution function 
 #'
-#' @param result object returned by get_distributions()
+#' @param result object returned by genetic_distribution()
 #' @param chr chromosome to be ploted
 #' @param ... extended parameters
 #'
-#' @method plot mclink_get_distributions
+#' @method plot mclink_genetic_distribution
 #' @export
-plot.mclink_get_distributions <- function(result, chr = NULL, ...){
+plot.mclink_genetic_distribution <- function(result, chr = NULL, ...){
   if(!is.null(chr)){
     plot_genetic_distance(result, chr = chr) |> print()
   }

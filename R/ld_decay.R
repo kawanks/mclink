@@ -190,15 +190,20 @@ ld_decay <- function(vcf, chr = NULL, max_dist = 1e5, maf = 0.05, bin_size = 500
 #' @method plot mclink_ld_decay
 #' @export
 plot.mclink_ld_decay <- function(x, chr = NULL, ...) {
+  chr_unique <- seq_along(x$chromosomes)
+
   if (is.null(chr)) {
     dat <- as.data.frame(x$genome)
   }else if(chr == "all"){
-    for(it in seq_along(x$chromosomes)){
+    for(it in chr_unique){
       print(plot.mclink_ld_decay(x, chr = it, ...))     
     }
 
     return(invisible(NULL))
   }else {
+    if (!(chr %in% chr_unique)) 
+      paste("The chromosome number is not valid, should be between chromosomes", min(chr_unique), "and", max(chr_unique)) |> stop()
+
     dat <- as.data.frame(x$chromosomes[[chr]])
   }
 
