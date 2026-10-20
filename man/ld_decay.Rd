@@ -6,7 +6,7 @@
 \usage{
 ld_decay(
   vcf,
-  chr = "all",
+  chr = NULL,
   max_dist = 1e+05,
   maf = 0.05,
   bin_size = 500,

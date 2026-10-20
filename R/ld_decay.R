@@ -111,7 +111,7 @@ aggregate_ld_decay <- function(results, chr, n_boot = 1000) {
 #'   bootstrap to get the conficende interval in the LD decay
 #'
 #' @export
-ld_decay <- function(vcf, chr = "all", max_dist = 1e5, maf = 0.05, bin_size = 500, block_size = 5e5){
+ld_decay <- function(vcf, chr = NULL, max_dist = 1e5, maf = 0.05, bin_size = 500, block_size = 5e5){
   
   gt <- vcf[[1]]
   chrs_pos <- vcf[[2]]
@@ -142,7 +142,7 @@ ld_decay <- function(vcf, chr = "all", max_dist = 1e5, maf = 0.05, bin_size = 50
     aggregate_ld_decay(results, chrs)
   }
 
-  if(chr == "all"){
+  if(is.null(chr)){
     cat("Calculating r² in the all chromosomes...\n")
     result_genome <- unique(chrs_pos) |> .calculate_ld_decay()
 
@@ -192,7 +192,13 @@ ld_decay <- function(vcf, chr = "all", max_dist = 1e5, maf = 0.05, bin_size = 50
 plot.mclink_ld_decay <- function(x, chr = NULL, ...) {
   if (is.null(chr)) {
     dat <- as.data.frame(x$genome)
-  } else {
+  }else if(chr == "all"){
+    for(it in seq_along(x$chromosomes)){
+      print(plot.mclink_ld_decay(x, chr = it, ...))     
+    }
+
+    return(invisible(NULL))
+  }else {
     dat <- as.data.frame(x$chromosomes[[chr]])
   }
 
