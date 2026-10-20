@@ -21,8 +21,8 @@ relative_diff <- function(M) {
     .Call(`_mclink_relative_diff`, M)
 }
 
-ld_decay_chr <- function(data, maf = 0.05, max_dist = 100000L, bin_size = 500L) {
-    .Call(`_mclink_ld_decay_chr`, data, maf, max_dist, bin_size)
+ld_decay_chr <- function(data, maf = 0.05, max_dist = 100000L, bin_size = 500L, block_size = 500000L) {
+    .Call(`_mclink_ld_decay_chr`, data, maf, max_dist, bin_size, block_size)
 }
 
 interchr_ld_mean <- function(data, n_pairs = 100000L, maf = 0.05) {

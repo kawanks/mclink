@@ -29,7 +29,6 @@ importFrom(ggplot2,
   theme_classic,
   unit
 )
-importFrom(patchwork,plot_layout)
 importFrom(vcfR,
   extract.gt,
   getCHROM,
