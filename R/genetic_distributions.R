@@ -92,20 +92,33 @@ genetic_distribution <- function(data,
 #'
 #' @param result object returned by genetic_distribution()
 #' @param chr chromosome to be ploted
+#' @param rd boolean to decide if should plot the genetic distance or the rd plot
 #' @param ... extended parameters
 #'
 #' @method plot mclink_genetic_distribution
 #' @export
-plot.mclink_genetic_distribution <- function(result, chr = NULL, ...){
+plot.mclink_genetic_distribution <- function(result, chr = NULL, rd = FALSE, ...){
   if(!is.null(chr)){
-    plot_genetic_distance(result, chr = chr) |> print()
+    if (rd)
+      plot_association_index(result, chr = chr) |> print()
+    else
+      plot_genetic_distance(result, chr = chr) |> print()
   }
 
   else if(!is.null(result$genome)){
-    plot_genetic_distance(result$genome) |> print()
+    if (rd)
+      plot_association_index(result) |> print()
+    else 
+      plot_genetic_distance(result$genome) |> print()
   }else{
     for (i in seq_along(result$chromosomes)) {
-      if(!is.null(result$chromosomes[[i]])) plot_genetic_distance(result, chr = i) |> print()
+      if(!is.null(result$chromosomes[[i]])){
+        if (rd)
+          plot_association_index(result, chr = i) |> print()
+        else
+          plot_genetic_distance(result, chr = i) |> print()
+
+      } 
     }
   }
 }
