@@ -219,7 +219,7 @@ plot_association_index <- function(
 # Single or all chromosomes 
   if (!is.null(chr)) {
     if (is.null(result$chromosomes))
-      stop("'chr' requires a result from distances_by_chr().")
+      stop("Chromosomes are NULL, requires a result from genetic_distribution(vcf_file, chr = 'by_chr').")
     
     chr_labels <- names(result$chromosomes)
     
@@ -260,7 +260,9 @@ plot_association_index <- function(
              paste(chr_labels, collapse = ", "))
       chr
     }
-    
+
+    if (is.null(result$chromosomes[[target_chr]])) stop(target_chr, " is NULL.")
+
     stats <- .calc_stats(result$chromosomes[[target_chr]])
     .print_stats(stats, target_chr)
     p <- .build_single_plot(stats, 
@@ -276,8 +278,16 @@ plot_association_index <- function(
   
 # Default:
 # Genome plot
-  genome_entry <- if (!is.null(result$chromosomes)) result$genome else result
-  stats <- .calc_stats(genome_entry)
+  if (is.null(result$genome)) {
+     for(it in seq_along(result$chromosomes)) {
+       if(!is.null(result$chromosomes[[it]])){
+          plot_association_index(result, chr = it)
+          return(invisible(NULL))
+       }
+     }
+  }
+
+  stats <- .calc_stats(result$genome)
   .print_stats(stats, "Genome")
   p <- .build_single_plot(stats, chr_label = NULL)
   if (save) .save_plot_to_file(p)
