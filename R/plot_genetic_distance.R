@@ -212,7 +212,7 @@ plot_genetic_distance <- function(
 # Single or all chromosomes 
   if (!is.null(chr)) {
     if (is.null(result$chromosomes))
-      stop("`chr` requires a result from distances_by_chr().")
+      stop("Chromosomes are NULL, requires a result from genetic_distribution(file, chr = 'by_chr').")
     
     chr_labels <- names(result$chromosomes)
     

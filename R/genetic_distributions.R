@@ -17,7 +17,7 @@
 
 
 genetic_distribution <- function(data, 
-                             chr = "all",
+                             chr = NULL,
                              iterations = 1000,
                              sample_size = 1000,
                              min_distance = 1000) {
@@ -31,14 +31,15 @@ genetic_distribution <- function(data,
   result_chr <- vector("list", length(chr_unique))
   names(result_chr) <- paste0("Chromosome ", sprintf("%02d", chr_unique))
 
-  if(chr == "all"){
+  if(is.null(chr)){
     result_genome <- simulate_panmixia(data,
                                         iterations   = iterations,
                                         sample_size  = sample_size,
                                         min_distance = min_distance)
+    result_chr = NULL 
   }else if(chr == "by_chr"){
     for (it_chr in chr_unique) {
-      cat("Processing Chromosome", it_chr, "\n")
+      cat("Processing chromosome", it_chr, "\n")
       idx <- which(chromosomes == it_chr)
 
       sub_data <- list(
@@ -54,7 +55,7 @@ genetic_distribution <- function(data,
 
     }
 
-    cat("Processing the whole genome\n")
+    cat("Processing whole genome\n")
     result_genome <- simulate_panmixia(data,
                                        iterations   = iterations,
                                        sample_size  = sample_size,
@@ -63,7 +64,7 @@ genetic_distribution <- function(data,
       if (!(chr %in% chr_unique)) 
          paste("The chromosome number is not valid, should be between chromosomes", min(chr_unique), "and", max(chr_unique)) |> stop()
       
-      cat("Processing Chromosome", chr, "\n")
+      cat("Processing chromosome", chr, "\n")
       idx <- which(chromosomes == chr)
       sub_data <- list(
                        geno[idx, ],
