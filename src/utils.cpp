@@ -276,7 +276,7 @@ Rcpp::List ld_decay_chr(
 
 
 // [[Rcpp::export]]
-double interchr_ld_mean(Rcpp::List data,
+double intrachr_ld_mean(Rcpp::List data,
                         int n_pairs = 100000,
                         double maf = 0.05) {
   

@@ -65,16 +65,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// interchr_ld_mean
-double interchr_ld_mean(Rcpp::List data, int n_pairs, double maf);
-RcppExport SEXP _mclink_interchr_ld_mean(SEXP dataSEXP, SEXP n_pairsSEXP, SEXP mafSEXP) {
+// intrachr_ld_mean
+double intrachr_ld_mean(Rcpp::List data, int n_pairs, double maf);
+RcppExport SEXP _mclink_intrachr_ld_mean(SEXP dataSEXP, SEXP n_pairsSEXP, SEXP mafSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< Rcpp::List >::type data(dataSEXP);
     Rcpp::traits::input_parameter< int >::type n_pairs(n_pairsSEXP);
     Rcpp::traits::input_parameter< double >::type maf(mafSEXP);
-    rcpp_result_gen = Rcpp::wrap(interchr_ld_mean(data, n_pairs, maf));
+    rcpp_result_gen = Rcpp::wrap(intrachr_ld_mean(data, n_pairs, maf));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -84,7 +84,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_mclink_simulate_panmixia", (DL_FUNC) &_mclink_simulate_panmixia, 4},
     {"_mclink_relative_diff", (DL_FUNC) &_mclink_relative_diff, 1},
     {"_mclink_ld_decay_chr", (DL_FUNC) &_mclink_ld_decay_chr, 5},
-    {"_mclink_interchr_ld_mean", (DL_FUNC) &_mclink_interchr_ld_mean, 3},
+    {"_mclink_intrachr_ld_mean", (DL_FUNC) &_mclink_intrachr_ld_mean, 3},
     {NULL, NULL, 0}
 };
 

@@ -143,37 +143,37 @@ ld_decay <- function(vcf, chr = NULL, max_dist = 1e5, maf = 0.05, bin_size = 500
   }
 
   if(is.null(chr)){
-    cat("Calculating r² in the all chromosomes...\n")
+    cat("Calculating r² in all chromosomes...\n")
     result_genome <- unique(chrs_pos) |> .calculate_ld_decay()
-
+    result_chr <- NULL
   }else if (chr == "by_chr") {
     for (it_chr in chr_unique) {
-      paste0("Calculating r² in the chromosome ", it_chr, "...\n") |> cat()
+      paste0("Calculating r² in chromosome ", it_chr, "...\n") |> cat()
       
       result_chr[[it_chr]] <- .calculate_ld_decay(it_chr)
     }
 
-    cat("Calculating r² in the all chromosomes...\n")
+    cat("Calculating r² in all chromosomes...\n")
     result_genome <- unique(chrs_pos) |> .calculate_ld_decay()
   }
   else{
     if (!(chr %in% chr_unique)) 
       paste("The chromosome number is not valid, should be between chromosomes", min(chr_unique), "and", max(chr_unique)) |> stop()
     
-    paste0("Calculating r² in the chromosome ", chr, "...\n") |> cat()
+    paste0("Calculating r² in chromosome ", chr, "...\n") |> cat()
     result_chr[[chr]] <- .calculate_ld_decay(chr)
       
     result_genome = NULL
   }
   
-  cat("Calculating the interchromosome r² mean...\n")
-  inter <- interchr_ld_mean(vcf)
+  cat("Calculating intrachromosome r² mean...\n")
+  intra <- intrachr_ld_mean(vcf)
   
   
   res <- list(
     genome = result_genome,
     chromosomes = result_chr,
-    interchr_ld_mean = inter
+    intrachr_ld_mean = intra
   )
 
   class(res) <- "mclink_ld_decay"
@@ -193,21 +193,32 @@ plot.mclink_ld_decay <- function(x, chr = NULL, ...) {
   chr_unique <- seq_along(x$chromosomes)
 
   if (is.null(chr)) {
-    dat <- as.data.frame(x$genome)
-  }else if(chr == "all"){
-    for(it in chr_unique){
-      print(plot.mclink_ld_decay(x, chr = it, ...))     
+    if (is.null(x$genome)) {
+      for (i in chr_unique) 
+        if(!is.null(x$chromosomes[[i]])) plot.mclink_ld_decay(x, chr = i, ...) |> print()
+      
+      return(invisible(NULL))
+    }else{
+      dat <- as.data.frame(x$genome)
     }
+  }else if(chr == "all"){
+    if(is.null(x$chromosomes)) stop("Chromosomes are NULL, requires a result from ld(vcf_file, chr = 'by_chr').")
+
+    message("Generating plots...")
+    for(i in chr_unique)
+      if(!is.null(x$chromosomes[[i]])) plot.mclink_ld_decay(x, chr = i, ...) |> print()
 
     return(invisible(NULL))
   }else {
+    if(is.null(x$chromosomes)) stop("Chromosomes are NULL, requires a result from ld(vcf_file, chr = 'by_chr').")
+
     if (!(chr %in% chr_unique)) 
       paste("The chromosome number is not valid, should be between chromosomes", min(chr_unique), "and", max(chr_unique)) |> stop()
 
     dat <- as.data.frame(x$chromosomes[[chr]])
   }
 
-  baseline <- x$interchr_ld_mean
+  baseline <- x$intrachr_ld_mean
 
   valid <- is.finite(dat$mean) & is.finite(dat$distance)
   xmax <- max(dat$distance[valid]) / 1e3

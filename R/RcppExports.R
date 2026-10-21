@@ -25,7 +25,7 @@ ld_decay_chr <- function(data, maf = 0.05, max_dist = 100000L, bin_size = 500L, 
     .Call(`_mclink_ld_decay_chr`, data, maf, max_dist, bin_size, block_size)
 }
 
-interchr_ld_mean <- function(data, n_pairs = 100000L, maf = 0.05) {
-    .Call(`_mclink_interchr_ld_mean`, data, n_pairs, maf)
+intrachr_ld_mean <- function(data, n_pairs = 100000L, maf = 0.05) {
+    .Call(`_mclink_intrachr_ld_mean`, data, n_pairs, maf)
 }
 
