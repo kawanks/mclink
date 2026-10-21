@@ -6,7 +6,7 @@
 \usage{
 genetic_distribution(
   data,
-  chr = "all",
+  chr = NULL,
   iterations = 1000,
   sample_size = 1000,
   min_distance = 1000
