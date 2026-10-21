@@ -4,7 +4,14 @@
 \alias{ld_decay}
 \title{Calculate the average LD decay for all chromosomes}
 \usage{
-ld_decay(vcf, chr = NULL, max_dist = 1e+05, maf = 0.05, bin_size = 500)
+ld_decay(
+  vcf,
+  chr = NULL,
+  max_dist = 1e+05,
+  maf = 0.05,
+  bin_size = 500,
+  block_size = 5e+05
+)
 }
 \arguments{
 \item{vcf}{a list returned by vcf2matrix function, with the genomic data, 
@@ -17,6 +24,9 @@ including positions and chromosomes of the SNPs}
 \item{maf}{minimum allele frequency to be used}
 
 \item{bin_size}{size of the bins to calculate the decay}
+
+\item{block_size}{size of the block - in pair bases - to be performed the 
+bootstrap to get the conficende interval in the LD decay}
 }
 \description{
 Calculate the average LD decay for all chromosomes

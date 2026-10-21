@@ -16,8 +16,8 @@
 #' @export
 
 
-get_distributions <- function(data, 
-                             chr = "all",
+genetic_distribution <- function(data, 
+                             chr = NULL,
                              iterations = 1000,
                              sample_size = 1000,
                              min_distance = 1000) {
@@ -31,14 +31,15 @@ get_distributions <- function(data,
   result_chr <- vector("list", length(chr_unique))
   names(result_chr) <- paste0("Chromosome ", sprintf("%02d", chr_unique))
 
-  if(chr == "all"){
+  if(is.null(chr)){
     result_genome <- simulate_panmixia(data,
                                         iterations   = iterations,
                                         sample_size  = sample_size,
                                         min_distance = min_distance)
+    result_chr = NULL 
   }else if(chr == "by_chr"){
     for (it_chr in chr_unique) {
-      cat("Processing Chromosome", it_chr, "\n")
+      cat("Processing chromosome", it_chr, "\n")
       idx <- which(chromosomes == it_chr)
 
       sub_data <- list(
@@ -54,7 +55,7 @@ get_distributions <- function(data,
 
     }
 
-    cat("Processing the whole genome\n")
+    cat("Processing whole genome\n")
     result_genome <- simulate_panmixia(data,
                                        iterations   = iterations,
                                        sample_size  = sample_size,
@@ -63,7 +64,7 @@ get_distributions <- function(data,
       if (!(chr %in% chr_unique)) 
          paste("The chromosome number is not valid, should be between chromosomes", min(chr_unique), "and", max(chr_unique)) |> stop()
       
-      cat("Processing Chromosome", chr, "\n")
+      cat("Processing chromosome", chr, "\n")
       idx <- which(chromosomes == chr)
       sub_data <- list(
                        geno[idx, ],
@@ -81,21 +82,21 @@ get_distributions <- function(data,
        chromosomes = result_chr,
        sample_size = sample_size) 
 
-  class(distributions) <- "mclink_get_distributions"
+  class(distributions) <- "mclink_genetic_distribution"
 
   distributions
 }
 
 
-#' Plot genetic distances got by get_distributions function 
+#' Plot genetic distances got by genetic_distribution function 
 #'
-#' @param result object returned by get_distributions()
+#' @param result object returned by genetic_distribution()
 #' @param chr chromosome to be ploted
 #' @param ... extended parameters
 #'
-#' @method plot mclink_get_distributions
+#' @method plot mclink_genetic_distribution
 #' @export
-plot.mclink_get_distributions <- function(result, chr = NULL, ...){
+plot.mclink_genetic_distribution <- function(result, chr = NULL, ...){
   if(!is.null(chr)){
     plot_genetic_distance(result, chr = chr) |> print()
   }
