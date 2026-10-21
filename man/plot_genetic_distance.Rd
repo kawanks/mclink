@@ -9,10 +9,8 @@ plot_genetic_distance(
   bw = 0.6,
   binwidth = 0.7,
   chr = NULL,
-  panel = FALSE,
-  all_results = FALSE,
   title = FALSE,
-  custom_title = NULL,
+  distribution = c("both", "observed", "panmictic"),
   xlim = NULL,
   save = FALSE,
   filename = "plot_distance"
@@ -28,22 +26,23 @@ Default: \code{0.6}.}
 \item{binwidth}{Numeric. Bin width for the observed distance histogram. 
 Default: \code{0.7}.}
 
-\item{chr}{Character or integer. Name or index of a single chromosome to plot. 
+\item{chr}{Character or integer. Name or index of a single
+chromosome to plot. 
 Requires a \code{distances_by_chr()} result. 
+Use \code{"all"} to generate one plot per chromosome.
+Use a chromosome name (\code {"Chromosome 01"}) or index
+(\code{1}) to plot a single chromosome. 
 Default: \code{NULL}.}
-
-\item{panel}{Logical. If \code{TRUE}, returns genome plot on top with 
-all chromosomes faceted below. 
-                   Default: \code{FALSE}.}
-
-\item{all_results}{If \code{TRUE}, generates one plot per entry (genome + chromosomes).
-Default: \code{FALSE}.}
 
 \item{title}{If \code{TRUE}, adds an auto-generated title.
 Default: \code{FALSE}.}
 
-\item{custom_title}{Custom title string, overrides \code{title}. 
-Default: \code{NULL}.}
+\item{distribution}{Character. 
+Default: \code{"both"} plots the observed pairwise
+genetic distances and the panmictic null distribution.
+\code{"observed"} plots only the ovserved distances/
+\code{"panmictic"} plots only the panmictic null
+distribution.}
 
 \item{xlim}{Optional \code{c(min, max)} for x-axis limits (%). 
 If \code{NULL}, inferred from data.}
@@ -55,27 +54,22 @@ Default: \code{FALSE}.}
 Default: \code{"plot_distance"}}
 }
 \value{
-A \code{ggplot} object, a \code{patchwork} object (when
-  \code{panel = TRUE}), or an invisible named list of \code{ggplot} objects
-  (when \code{all_results = TRUE}).
+A \code{ggplot} object.
 }
 \description{
 Plots the observed pairwise genetic distance distribution against the
 panmictic expectation. Supports genome-wide, per-chromosome, panel,
-and batch plots from \code{distances_by_chr()} or \code{simulate_panmixia()} 
+and batch plots from \code{distances_by_chr()} or \code{simulate_panmixia()}
 results.
 }
 \details{
-Four plotting modes are available, evaluated in the following order:
+Three plotting modes are available, evaluated in the following order:
 \enumerate{
-  \item \strong{Default}: Genome plot, or a plain \code{simulate_panmixia()} 
-  result.
+  \item \strong{Default}: Genome plot.
   \item \strong{Single chromosome} (\code{chr}): Plot for one chromosome,
     selected by name or index.
-  \item \strong{All results} (\code{all_results = TRUE}): Generates one plot
-    per entry (genome + each chromosome), printing and optionally saving each
+  \item \strong{All} (\code{chr = "all"}): Generates one plot
+    per entry (each chromosome), printing and optionally saving each
     individually.
-  \item \strong{Panel} (\code{panel = TRUE}): Stacked figure with the
-    genome plot on top and all chromosomes faceted below.
 }
 }

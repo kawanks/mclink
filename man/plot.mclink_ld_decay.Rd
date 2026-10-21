@@ -4,10 +4,12 @@
 \alias{plot.mclink_ld_decay}
 \title{Plot LD decay}
 \usage{
-\method{plot}{mclink_ld_decay}(x, ...)
+\method{plot}{mclink_ld_decay}(x, chr = NULL, ...)
 }
 \arguments{
 \item{x}{object returned by ld_decay()}
+
+\item{chr}{chromosome to be ploted in case of analyses by chromosomes}
 
 \item{...}{extended parameters}
 }

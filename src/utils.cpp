@@ -3,6 +3,7 @@
 #include <RcppArmadillo.h>
 #include <vector>
 #include <bitset>
+#include <algorithm>
 
 
 // Convert sparse column in a dense vector with: -1, 0 and 1
@@ -142,101 +143,140 @@ Rcpp::List spmat2bitset(const arma::sp_mat &M){
 
 
 // [[Rcpp::export]]
-Rcpp::List ld_decay_chr(Rcpp::List data, 
-                    double maf = 0.05,
-                    int max_dist = 100000,
-                    int bin_size = 500){
-  
-  arma::sp_mat M = Rcpp::as<arma::sp_mat>(data[0]); 
-  std::vector<int> pos = Rcpp::as<std::vector<int>>(data[1]);
-  
+Rcpp::List ld_decay_chr(
+    Rcpp::List data,
+    double maf = 0.05,
+    int max_dist = 100000,
+    int bin_size = 500,
+    int block_size = 500000
+) {
+  arma::sp_mat M = Rcpp::as<arma::sp_mat>(data[0]);
+  std::vector<int> pos =
+    Rcpp::as<std::vector<int>>(data[1]);
+
+  if (block_size <= 0 || bin_size <= 0 || max_dist < bin_size) {
+    Rcpp::stop("Invalid block_size, bin_size or max_dist.");
+  }
+
   Rcpp::List Bitset = spmat2bitset(M);
-  std::vector<uint64_t> G = Rcpp::as<std::vector<uint64_t>>(Bitset[0]);
-  std::vector<uint64_t> Mk = Rcpp::as<std::vector<uint64_t>>(Bitset[1]); 
-  
+
+  std::vector<uint64_t> G =
+    Rcpp::as<std::vector<uint64_t>>(Bitset[0]);
+  std::vector<uint64_t> Mk =
+    Rcpp::as<std::vector<uint64_t>>(Bitset[1]);
+
   int snps = Rcpp::as<int>(Bitset[2]);
   int parts = Rcpp::as<int>(Bitset[3]);
-  
+
   int n_bins = max_dist / bin_size;
+
   std::vector<double> sum_r2(n_bins, 0.0);
   std::vector<int> count(n_bins, 0);
-  
+
+  // Cada SNP é atribuído a um bloco físico.
+  // Posições genômicas são consideradas 1-based.
+  int max_pos = *std::max_element(pos.begin(), pos.end());
+  int n_blocks = (max_pos - 1) / block_size + 1;
+
+  std::vector<int> block_of_snp(snps);
+
+  for (int i = 0; i < snps; i++) {
+    block_of_snp[i] = (pos[i] - 1) / block_size;
+  }
+
+  // Contribuições de cada bloco para cada bin.
+  Rcpp::NumericMatrix block_sum_r2(n_blocks, n_bins);
+  Rcpp::IntegerMatrix block_count(n_blocks, n_bins);
+
+  std::fill(
+    block_sum_r2.begin(), block_sum_r2.end(), 0.0
+  );
+  std::fill(
+    block_count.begin(), block_count.end(), 0
+  );
+
   for (int i = 0; i < snps; i++) {
     for (int j = i + 1; j < snps; j++) {
+
       int dist = pos[j] - pos[i];
       if (dist > max_dist) break;
-      
+
       int kij = 0;
-      int ki  = 0;
-      int kj  = 0;
+      int ki = 0;
+      int kj = 0;
       int nij = 0;
-    
+
       for (int w = 0; w < parts; w++) {
-      
         uint64_t gi = G[i * parts + w];
         uint64_t gj = G[j * parts + w];
-      
+
         uint64_t mi = Mk[i * parts + w];
         uint64_t mj = Mk[j * parts + w];
-      
+
         uint64_t valid = mi & mj;
         if (valid == 0) continue;
-      
-        // Verify if is possible use the popcount standart function of C++
+
         nij += __builtin_popcountll(valid);
-      
         kij += __builtin_popcountll(gi & gj & valid);
         ki  += __builtin_popcountll(gi & valid);
         kj  += __builtin_popcountll(gj & valid);
       }
-    
+
       if (nij < 10) continue;
-      
+
       double pi = (double) ki / nij;
       double pj = (double) kj / nij;
-    
-      // Filter maf
+
       if (pi < maf || pi > (1.0 - maf)) continue;
       if (pj < maf || pj > (1.0 - maf)) continue;
-    
+
       double pij = (double) kij / nij;
-  
       double D = pij - pi * pj;
       double den = pi * (1.0 - pi) * pj * (1.0 - pj);
-      
+
       if (den <= 0) continue;
-      
+
       double r2 = (D * D) / den;
-      
+
       int bin = dist / bin_size;
+
       if (bin < n_bins) {
         sum_r2[bin] += r2;
         count[bin] += 1;
+
+        // Cada par é atribuído ao bloco do SNP i.
+        int block = block_of_snp[i];
+
+        block_sum_r2(block, bin) += r2;
+        block_count(block, bin) += 1;
       }
     }
   }
- 
+
   std::vector<double> mean_r2(n_bins, NA_REAL);
   std::vector<int> distance(n_bins);
-  
+
   for (int b = 0; b < n_bins; b++) {
     distance[b] = b * bin_size;
-    
+
     if (count[b] > 0) {
       mean_r2[b] = sum_r2[b] / count[b];
     }
   }
-  
+
   return Rcpp::List::create(
     Rcpp::_["distance"] = distance,
     Rcpp::_["mean_r2"] = mean_r2,
-    Rcpp::_["count"] = count
+    Rcpp::_["sum_r2"] = sum_r2,
+    Rcpp::_["count"] = count,
+    Rcpp::_["block_sum_r2"] = block_sum_r2,
+    Rcpp::_["block_count"] = block_count
   );
 }
 
 
 // [[Rcpp::export]]
-double interchr_ld_mean(Rcpp::List data,
+double intrachr_ld_mean(Rcpp::List data,
                         int n_pairs = 100000,
                         double maf = 0.05) {
   

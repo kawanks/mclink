@@ -2,26 +2,23 @@
 % Please edit documentation in R/plot_association_index.R
 \name{plot_association_index}
 \alias{plot_association_index}
-\title{Plot the Standardised Index of Association (sIA)}
+\title{Plot the Standardised Index of Association (rd)}
 \usage{
 plot_association_index(
   result,
   sample_size = 1000L,
   statistics = FALSE,
   chr = NULL,
-  panel = FALSE,
-  all_results = FALSE,
   title = FALSE,
-  custom_title = NULL,
   save = FALSE,
-  filename = "plot_sIA"
+  filename = "plot_rd"
 )
 }
 \arguments{
 \item{result}{A list returned by \code{simulate_panmixia()} or
 \code{distances_by_chr()}.}
 
-\item{sample_size}{Integer. Number of samples used to compute sIA.
+\item{sample_size}{Integer. Number of SNPs sampled per iteration.
 Auto-detected from \code{result} when available. 
 Default: \code{1000L}.}
 
@@ -32,18 +29,8 @@ Default: \code{FALSE}.}
 Requires a \code{distances_by_chr()} result. 
 Default: \code{NULL}.}
 
-\item{panel}{Logical. If \code{TRUE}, returns genome plot on top with 
-all chromosomes faceted below. 
-                   Default: \code{FALSE}.}
-
-\item{all_results}{If \code{TRUE}, generates one plot per entry (genome + chromosomes).
-Default: \code{FALSE}.}
-
 \item{title}{If \code{TRUE}, adds an auto-generated title.
 Default: \code{FALSE}.}
-
-\item{custom_title}{Custom title string, overrides \code{title}. 
-Default: \code{NULL}.}
 
 \item{save}{If \code{TRUE}, saves the plot to \code{filename}.
 Default: \code{FALSE}.}
@@ -52,27 +39,22 @@ Default: \code{FALSE}.}
 Default: \code{"plot_sIA"}}
 }
 \value{
-A \code{ggplot} object, a \code{patchwork} object (when
-  \code{panel = TRUE}), or an invisible named list of \code{ggplot} objects
-  (when \code{all_results = TRUE}).
+A \code{ggplot} object.
 }
 \description{
 Plots the null distribution of the standardised index of association
-(sIA) against the panmictic expectation (sIA = 0). 
+(rd) against the panmictic expectation (rd = 0). 
 Supports genome-wide, per-chromosome, panel, and batch plots from 
 \code{distances_by_chr()} or \code{simulate_panmixia()} results.
 }
 \details{
-Four plotting modes are available, evaluated in the following order:
+Three plotting modes are available, evaluated in the following order:
 \enumerate{
-  \item \strong{Default}: Genome plot, or a plain \code{simulate_panmixia()} 
-  result.
+  \item \strong{Default}: Genome plot.
   \item \strong{Single chromosome} (\code{chr}): Plot for one chromosome,
     selected by name or index.
-  \item \strong{All results} (\code{all_results = TRUE}): Generates one plot
-    per entry (genome + each chromosome), printing and optionally saving each
+  \item \strong{All} (\code{chr = "all"}): Generates one plot
+    per entry (each chromosome), printing and optionally saving each
     individually.
-  \item \strong{Panel} (\code{panel = TRUE}): Stacked figure with the
-    genome plot on top and all chromosomes faceted below.
 }
 }
