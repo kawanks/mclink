@@ -62,11 +62,11 @@ ld <- ld_decay(vcf)
 plot(ld)
 
 # Calculate the distributions of relative genetic distances observed and simulating panmixia
-sim <- simulate_panmixia(vcf)
+sim <- genetic_distribution(vcf)
 
 # Plot these distributions
-plot_genetic_distance(sim)
+plot(sim)
 
-# Plot the standardized association index distribution
-plot_association_index(sim)
+# Plot the standardized association index distribution (rd)
+plot(sim, rd = TRUE)
 ```
