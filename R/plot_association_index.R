@@ -105,6 +105,20 @@ plot_association_index <- function(
                                  chr_label   = NULL,
                                  show_x_axis = TRUE,
                                  title       = TRUE) {
+    if (is.null(stats$rd_sd)) {
+      p <- ggplot(data.frame(values = stats$values), aes(x = values)) +
+        theme_classic(base_family = "Times") + 
+        geom_vline(xintercept = 0, linetype = "dashed", color = "red") +
+        labs(
+          title = .build_plot_title(chr_label),
+          x     = if (show_x_axis) expression(bar(r)[d]) else NULL,
+          y     = "Density"
+        )
+
+      warning("Just one value to calculate, therefore rd is indertemined as the variances are 0.")
+      return(p)
+    }
+    
     pf      <- .format_pvalue(stats$p)
     x_range <- seq(stats$x_lower, stats$x_upper, length.out = 1000)
     
