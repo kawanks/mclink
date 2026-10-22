@@ -7,7 +7,7 @@
 plot_association_index(
   result,
   sample_size = 1000L,
-  statistics = FALSE,
+  statistics = TRUE,
   chr = NULL,
   title = FALSE,
   save = FALSE,
