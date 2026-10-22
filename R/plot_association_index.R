@@ -105,7 +105,7 @@ plot_association_index <- function(
                                  chr_label   = NULL,
                                  show_x_axis = TRUE,
                                  title       = TRUE) {
-    if (is.null(stats$rd_sd)) {
+    if (is.na(stats$sd)) {
       p <- ggplot(data.frame(values = stats$values), aes(x = values)) +
         theme_classic(base_family = "Times") + 
         geom_vline(xintercept = 0, linetype = "dashed", color = "red") +
