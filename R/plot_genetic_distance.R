@@ -49,7 +49,7 @@
 #' }
 #'
 #'
-#' @importFrom ggplot2 ggplot aes geom_histogram geom_line coord_cartesian
+#' @importFrom ggplot2 ggplot aes geom_histogram geom_line coord_cartesian geom_density
 #' @importFrom ggplot2 scale_fill_manual scale_color_manual labs theme_classic theme
 #' @importFrom ggplot2 element_text element_blank unit after_stat
 #'

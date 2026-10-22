@@ -4,12 +4,14 @@
 \alias{plot.mclink_genetic_distribution}
 \title{Plot genetic distances got by genetic_distribution function}
 \usage{
-\method{plot}{mclink_genetic_distribution}(result, chr = NULL, ...)
+\method{plot}{mclink_genetic_distribution}(result, chr = NULL, rd = FALSE, ...)
 }
 \arguments{
 \item{result}{object returned by genetic_distribution()}
 
 \item{chr}{chromosome to be ploted}
+
+\item{rd}{boolean to decide if should plot the genetic distance or the rd plot}
 
 \item{...}{extended parameters}
 }

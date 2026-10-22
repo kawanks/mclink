@@ -6,7 +6,7 @@
 \usage{
 plot_genetic_distance(
   result,
-  bw = 0.6,
+  bw = 0.2,
   binwidth = 0.7,
   chr = NULL,
   title = FALSE,
