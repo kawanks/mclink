@@ -59,7 +59,7 @@
 
 plot_genetic_distance <- function(
     result,
-    bw               = 0.6,
+    bw               = 0.2,
     binwidth         = 0.7,
     chr              = NULL,
     title            = FALSE,
@@ -86,17 +86,18 @@ plot_genetic_distance <- function(
     observed_data <- observed_data[observed_data >= x_lower & observed_data <= x_upper]
     
     # Kernel density estimate for the panmictic expectation curve
-    panmictic_density <- density(
-      panmictic_data,
-      bw   = bw,
-      from = x_lower,
-      to   = x_upper,
-      n    = 256
-    )
+#    panmictic_density <- density(
+#      panmictic_data,
+#      bw   = bw,
+#      adjust = 0.4,
+#      from = x_lower,
+#      to   = x_upper,
+#      n    = 256
+#    )
     
     list(
       observed_df  = data.frame(distance = observed_data),
-      panmictic_df = data.frame(x = panmictic_density$x, y = panmictic_density$y),
+      panmictic_df = data.frame(distance = panmictic_data),
       x_lower      = x_lower,
       x_upper      = x_upper
     )
@@ -121,11 +122,14 @@ plot_genetic_distance <- function(
         
     # Panmictic expectation density curve
     if (distribution %in% c("both", "panmictic")) {
-      p <- p + geom_line(
-      data = plot_data$panmictic_df,
-      aes(x = x, y = y, color = "Panmictic"),
-      linewidth = 0.7, inherit.aes = FALSE
-    )
+      p <- p +
+        geom_density(
+        data = plot_data$panmictic_df,
+        aes(x = distance, color = "Panmictic"),
+        bw = bw,
+        inherit.aes = FALSE,
+        linewidth = 0.7
+      )
     } 
     
     p <- p + 
