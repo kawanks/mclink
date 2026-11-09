@@ -147,15 +147,14 @@ Rcpp::List ld_decay_chr(
     Rcpp::List data,
     double maf = 0.05,
     int max_dist = 100000,
-    int bin_size = 500,
-    int block_size = 500000
+    int bin_size = 500
 ) {
   arma::sp_mat M = Rcpp::as<arma::sp_mat>(data[0]);
   std::vector<int> pos =
     Rcpp::as<std::vector<int>>(data[1]);
 
-  if (block_size <= 0 || bin_size <= 0 || max_dist < bin_size) {
-    Rcpp::stop("Invalid block_size, bin_size or max_dist.");
+  if (bin_size <= 0 || max_dist < bin_size) {
+    Rcpp::stop("Invalid bin_size or max_dist.");
   }
 
   Rcpp::List Bitset = spmat2bitset(M);
@@ -173,27 +172,6 @@ Rcpp::List ld_decay_chr(
   std::vector<double> sum_r2(n_bins, 0.0);
   std::vector<int> count(n_bins, 0);
 
-  // Cada SNP é atribuído a um bloco físico.
-  // Posições genômicas são consideradas 1-based.
-  int max_pos = *std::max_element(pos.begin(), pos.end());
-  int n_blocks = (max_pos - 1) / block_size + 1;
-
-  std::vector<int> block_of_snp(snps);
-
-  for (int i = 0; i < snps; i++) {
-    block_of_snp[i] = (pos[i] - 1) / block_size;
-  }
-
-  // Contribuições de cada bloco para cada bin.
-  Rcpp::NumericMatrix block_sum_r2(n_blocks, n_bins);
-  Rcpp::IntegerMatrix block_count(n_blocks, n_bins);
-
-  std::fill(
-    block_sum_r2.begin(), block_sum_r2.end(), 0.0
-  );
-  std::fill(
-    block_count.begin(), block_count.end(), 0
-  );
 
   for (int i = 0; i < snps; i++) {
     for (int j = i + 1; j < snps; j++) {
@@ -243,12 +221,6 @@ Rcpp::List ld_decay_chr(
       if (bin < n_bins) {
         sum_r2[bin] += r2;
         count[bin] += 1;
-
-        // Cada par é atribuído ao bloco do SNP i.
-        int block = block_of_snp[i];
-
-        block_sum_r2(block, bin) += r2;
-        block_count(block, bin) += 1;
       }
     }
   }
@@ -268,9 +240,7 @@ Rcpp::List ld_decay_chr(
     Rcpp::_["distance"] = distance,
     Rcpp::_["mean_r2"] = mean_r2,
     Rcpp::_["sum_r2"] = sum_r2,
-    Rcpp::_["count"] = count,
-    Rcpp::_["block_sum_r2"] = block_sum_r2,
-    Rcpp::_["block_count"] = block_count
+    Rcpp::_["count"] = count
   );
 }
 

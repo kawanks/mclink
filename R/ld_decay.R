@@ -111,7 +111,7 @@ aggregate_ld_decay <- function(results, chr, n_boot = 1000) {
 #'   bootstrap to get the conficende interval in the LD decay
 #'
 #' @export
-ld_decay <- function(vcf, chr = NULL, max_dist = 1e5, maf = 0.05, bin_size = 500, block_size = 5e5){
+ld_decay <- function(vcf, chr = NULL, max_dist = 1e5, maf = 0.05, bin_size = 500){
   
   gt <- vcf[[1]]
   chrs_pos <- vcf[[2]]
@@ -134,8 +134,7 @@ ld_decay <- function(vcf, chr = NULL, max_dist = 1e5, maf = 0.05, bin_size = 500
                           list(gt_chr, pos_chr),
                           maf = maf,
                           max_dist = max_dist,
-                          bin_size = bin_size,
-                          block_size = block_size
+                          bin_size = bin_size
                         )
   })
 
