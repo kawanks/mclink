@@ -1,101 +1,46 @@
-bootstrap_ld_decay <- function(results, n_boot = 1000) {
+aggregate_ld_decay <- function(results, chr = NULL) {
 
   n_bins <- length(results[[1]]$distance)
 
-  # Curva observada
-  total_sum <- Reduce(
-    `+`,
-    lapply(results, function(res) res$sum_r2)
-  )
-
-  total_count <- Reduce(
-    `+`,
-    lapply(results, function(res) res$count)
-  )
-
-  mean <- rep(NA_real_, n_bins)
-  valid <- total_count > 0
-
-  mean[valid] <- total_sum[valid] / total_count[valid]
-
-  # Uma curva por réplica bootstrap
-  boot <- matrix(NA_real_, nrow = n_boot, ncol = n_bins)
-
-  for (b in seq_len(n_boot)) {
-
-    boot_sum <- numeric(n_bins)
-    boot_count <- numeric(n_bins)
-
-    for (res in results) {
-
-      block_sum <- res$block_sum_r2
-      block_count <- res$block_count
-
-      n_blocks <- nrow(block_sum)
-
-      # Reamostra o mesmo número de blocos do cromossomo
-      sampled <- sample.int(
-        n_blocks,
-        size = n_blocks,
-        replace = TRUE
-      )
-
-      boot_sum <- boot_sum +
-        colSums(block_sum[sampled, , drop = FALSE])
-
-      boot_count <- boot_count +
-        colSums(block_count[sampled, , drop = FALSE])
-    }
-
-    valid <- boot_count > 0
-    boot[b, valid] <- boot_sum[valid] / boot_count[valid]
-  }
-
-  # Intervalos percentis de 95%
-  ci <- vapply(seq_len(n_bins), function(j) {
-
-    values <- boot[, j]
-    values <- values[is.finite(values)]
-
-    if (length(values) == 0) {
-      return(c(lower = NA_real_, upper = NA_real_))
-    }
-
-    stats::quantile(
-      values,
-      probs = c(0.025, 0.975),
-      names = FALSE
+  # Reúne os valores individuais de todos os cromossomos
+  values_by_bin <- lapply(seq_len(n_bins), function(j) {
+    unlist(
+      lapply(results, function(res) res$r2_values[[j]]),
+      use.names = FALSE
     )
+  })
 
-  }, numeric(2))
+  # Calcula as estatísticas por faixa de distância
+  mean_r2 <- vapply(values_by_bin, function(values) {
+    if (length(values) == 0) return(NA_real_)
+    mean(values)
+  }, numeric(1))
+
+  median_r2 <- vapply(values_by_bin, function(values) {
+    if (length(values) == 0) return(NA_real_)
+    median(values)
+  }, numeric(1))
+
+  lower <- vapply(values_by_bin, function(values) {
+    if (length(values) == 0) return(NA_real_)
+    unname(quantile(values, 0.025))
+  }, numeric(1))
+
+  upper <- vapply(values_by_bin, function(values) {
+    if (length(values) == 0) return(NA_real_)
+    unname(quantile(values, 0.975))
+  }, numeric(1))
+
+  count <- lengths(values_by_bin)
 
   list(
     distance = results[[1]]$distance,
-    mean = mean,
-    lower = ci[1, ],
-    upper = ci[2, ],
-    count = total_count
+    mean = mean_r2,
+    median = median_r2,
+    lower = lower,
+    upper = upper,
+    count = count
   )
-}
-
-
-aggregate_ld_decay <- function(results, chr, n_boot = 1000) {
-
-  out <- bootstrap_ld_decay(
-    results,
-    n_boot = n_boot
-  )
-
-  out$main <- if (length(chr) > 1) {
-    "All Chromosomes"
-  } else {
-    paste0(
-      "Chromosome ",
-      chr
-    )
-  }
-
-  out
 }
 
 
@@ -107,8 +52,6 @@ aggregate_ld_decay <- function(results, chr, n_boot = 1000) {
 #' @param max_dist maximum distance to calculate the LD decay
 #' @param maf minimum allele frequency to be used
 #' @param bin_size size of the bins to calculate the decay
-#' @param block_size size of the block - in pair bases - to be performed the 
-#'   bootstrap to get the conficende interval in the LD decay
 #'
 #' @export
 ld_decay <- function(vcf, chr = NULL, max_dist = 1e5, maf = 0.05, bin_size = 500){
@@ -193,12 +136,13 @@ plot.mclink_ld_decay <- function(x, chr = NULL, ...) {
 
   if (is.null(chr)) {
     if (is.null(x$genome)) {
-      for (i in chr_unique) 
+      for (i in chr_unique)
         if(!is.null(x$chromosomes[[i]])) plot.mclink_ld_decay(x, chr = i, ...) |> print()
       
       return(invisible(NULL))
     }else{
       dat <- as.data.frame(x$genome)
+      title <- "All Chromosomes"
     }
   }else if(chr == "all"){
     if(is.null(x$chromosomes)) stop("Chromosomes are NULL, requires a result from ld(vcf_file, chr = 'by_chr').")
@@ -215,9 +159,10 @@ plot.mclink_ld_decay <- function(x, chr = NULL, ...) {
       paste("The chromosome ", chr, " is not valid. The chromosomes numbers available are: ", paste(chr_unique, collapse = ", ")) |> stop()
 
     dat <- as.data.frame(x$chromosomes[[chr]])
+    title <- paste("Chromosome", chr)
   }
 
-  baseline <- x$intrachr_ld_mean
+  #baseline <- x$intrachr_ld_mean
 
   valid <- is.finite(dat$mean) & is.finite(dat$distance)
   xmax <- max(dat$distance[valid]) / 1e3
@@ -232,30 +177,35 @@ plot.mclink_ld_decay <- function(x, chr = NULL, ...) {
 
   ggplot2::ggplot(
     dat,
-    ggplot2::aes(x = distance / 1e3, y = mean)
+    ggplot2::aes(x = distance / 1e3)
   ) +
     ggplot2::geom_ribbon(
       ggplot2::aes(ymin = lower, ymax = upper),
-      fill = "steelblue",
       alpha = 0.2,
       na.rm = TRUE
     ) +
-    ggplot2::geom_line(...) +
-    ggplot2::geom_hline(
-      yintercept = baseline,
-      linetype = "dashed"
-    ) +
+    geom_line(
+              aes(y = median, linetype = "Median")
+              ) +
+    geom_line(
+              aes(y = mean, linetype = "Average")
+              ) +
+    # ggplot2::geom_hline(
+    #   yintercept = baseline,
+    #   linetype = "dashed"
+    # ) +
     ggplot2::labs(
-      title = dat$main[1],
+      title = title,
       x = "Distance (kb)",
-      y = expression(r^2)
+      y = expression(r^2),
+      linetype = "Estimator"
     ) +
     ggplot2::coord_cartesian(
       xlim = c(-xpad, xmax + xpad),
       ylim = c(ymin - ypad, ymax + ypad),
       expand = FALSE
     ) +
-    ggplot2::theme_classic() +
+    ggplot2::theme_minimal() +
     ggplot2::theme(
       plot.title = ggplot2::element_text(hjust = 0.5)
     )

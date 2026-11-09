@@ -169,8 +169,7 @@ Rcpp::List ld_decay_chr(
 
   int n_bins = max_dist / bin_size;
 
-  std::vector<double> sum_r2(n_bins, 0.0);
-  std::vector<int> count(n_bins, 0);
+  std::vector<std::vector<double>> r2_values(n_bins);
 
 
   for (int i = 0; i < snps; i++) {
@@ -219,28 +218,20 @@ Rcpp::List ld_decay_chr(
       int bin = dist / bin_size;
 
       if (bin < n_bins) {
-        sum_r2[bin] += r2;
-        count[bin] += 1;
+        r2_values[bin].push_back(r2);
       }
     }
   }
 
-  std::vector<double> mean_r2(n_bins, NA_REAL);
   std::vector<int> distance(n_bins);
 
   for (int b = 0; b < n_bins; b++) {
     distance[b] = b * bin_size;
-
-    if (count[b] > 0) {
-      mean_r2[b] = sum_r2[b] / count[b];
-    }
   }
 
   return Rcpp::List::create(
     Rcpp::_["distance"] = distance,
-    Rcpp::_["mean_r2"] = mean_r2,
-    Rcpp::_["sum_r2"] = sum_r2,
-    Rcpp::_["count"] = count
+    Rcpp::_["r2_values"] = r2_values
   );
 }
 
